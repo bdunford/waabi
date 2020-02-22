@@ -1,0 +1,2 @@
+import waabi
+waabi.main()
