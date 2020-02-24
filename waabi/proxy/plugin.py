@@ -1,5 +1,5 @@
 import proxy
-
+import waabi
 #from typing import Optional
 #from ..common.constants import DOT, SLASH
 #from ..common.utils import build_http_response
@@ -21,10 +21,7 @@ class WaabiProxyPlugin(proxy.http.proxy.plugin.HttpProxyBasePlugin):
             "body": self.xb(r.body)
         }
 
-        print("-" * 100)
-        print(message)
-
-
+        waabi.proxy.logger.WaabiProxyLogger.Log(message) 
         return r
 
     def handle_upstream_chunk(self, chunk: memoryview) -> memoryview:

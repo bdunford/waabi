@@ -23,7 +23,6 @@ class Threader(object):
 
     def start(self, waitForWork=False):
         self.waitForWork = waitForWork
-
         for tc in range(self.threadCount):
             t = Thread(target=self._getWork)
             t.start()
@@ -46,10 +45,11 @@ class Threader(object):
 
     def _nextWorkItem(self):
         with self.qlock:
+            print(self.work)
             if len(self.work) > 0:
                 return self.work.pop(0)
         if self.waitForWork:
-            time.sleep(.2)
+            time.sleep(1)
             return self._nextWorkItem()
         return False
 
@@ -60,6 +60,7 @@ class Threader(object):
             w = self._nextWorkItem()
 
     def _doWork(self,w):
+        print("doing")
         try:
             r = None
             if isinstance(w,tuple):
