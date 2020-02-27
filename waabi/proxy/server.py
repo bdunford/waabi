@@ -4,7 +4,7 @@ import waabi
 
 class Server(object):
     def __init__(self):
-        pass
+        waabi.globals.requests = {}
 
     def run(self):
         proxy.main([
