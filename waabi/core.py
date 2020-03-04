@@ -1,5 +1,5 @@
 import argparse
-
+import sys
 
 class Options(object):
 
@@ -53,4 +53,5 @@ class Base(object):
             print("{0}: {1} Failed to Initialize........".format(self.options.action,self.options.parameter))
             print(e)
             print(self.Help())
+            sys.exit()
         self.Run()

@@ -5,9 +5,9 @@ import requests
 from waabi.core import Base
 from waabi.utility.reader import Reader
 from waabi.utility.threads import Threader
+from waabi.utility.writer import Writer
 import time
 requests.packages.urllib3.disable_warnings()
-#TODO wire up header 
 
 
 class Scanner(Base):
@@ -19,14 +19,18 @@ class Scanner(Base):
             self._wl = Reader.Wordlist(os.path.join(waabi.globals.wordlist_path,"web-common.txt"))
 
         if not self.options.output:
-            self.options.output = "./dirscan.py"
-
+            self.options.output = "./dirscan.txt"
+        
+        if self.options.header:
+            self._header = Reader.Json(self.options.header)
+        else: 
+            self._header = waabi.globals.default_header 
+        
         self.options.header = {}
         self._counter = 0
         self._errors = 0
         self._found = []
         self._counts = {}
-
 
 
     def Help(self):
@@ -43,13 +47,11 @@ class Scanner(Base):
             t.start()
             elapsed = time.gmtime(time.time() - s)
             final = self.update_display(True)
+            
+            Writer.Replace(self.options.output,final)
 
-            with open(self.options.output,'w') as f:
-                f.write(final)
-                f.close()
 
     def build_url(self,w):
-        #consider trailing slashes
         u = self.options.parameter
         if u[-1:] != "/":
             u += "/"
@@ -60,7 +62,6 @@ class Scanner(Base):
             r = requests.get(url, headers=self.options.header, timeout=5, verify=False)
             return {"url" : r.url, "status" : r.status_code, "length": int(r.headers["content-length"])}
         except:
-            #print(sys.exc_info())
             return {"url" : url, "status" : 999, "length": 0}
 
     def results(self,r):
