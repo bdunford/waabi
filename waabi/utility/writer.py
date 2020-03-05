@@ -1,4 +1,4 @@
-
+import json
 import sys
 import os
 
@@ -18,6 +18,15 @@ class Writer(object):
         Writer.EnsureFilePath(filepath)
         with open(filepath,'w') as w:
             w.write(content)
+            w.close()
+
+    @staticmethod
+    def Json(filepath, content):
+
+        Writer.EnsureFilePath(filepath)
+        j = json.dumps(content,indent=4)
+        with open(filepath,'w') as w:
+            w.write(j)
             w.close()
 
     @staticmethod
