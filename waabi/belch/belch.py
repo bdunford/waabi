@@ -5,6 +5,7 @@ from waabi.core import Base
 from waabi.utility.reader import Reader
 from waabi.utility.writer import Writer
 from waabi.belch.parser import Parser
+import os
 
 class Belch(Base):
 
@@ -13,42 +14,32 @@ class Belch(Base):
             raise ValueError("Missing required option -i Burp xml export ")
         self._burp_xml = Reader.Xml(self.options.input)
 
-        if not self.options.output:
-            self.options.output = "./header.json"
 
     def Help(self):
         return "belch [header|code|parse] [options: -i burp xml export , -o output]"
 
     def Run(self):
-        self.header()
-        #need to know the cmd
+        parsed = Parser.ParseBurpLog(self._burp_xml)
+        if self.options.parameter == "header":
+            self.header(parsed)
+        if self.options.parameter == "code":
+            self.code(parsed)
 
-    def header(self):
-        p = Parser.ParseBurpLog(self._burp_xml)
-
-        Writer.Json(self.options.output,p[0].request.header)
+    def header(self, parsed):
+        if not self.options.output:
+            self.options.output = "./header.json"
+        Writer.Json(self.options.output,parsed[0].request.header)
         print("Header Written to: {0}".format(self.options.output))
-        
-        #print(p[0].request.raw)
-        #for r in p:
-        #    if r.status == "504":
-        #        print(r.response.raw)
-        #print(p[0].request.cookies)
-        #print(p[0].response.cookies)
 
-        #if req.get("base64") == "true":
-        #    print("enc")
-        #    raw = str(base64.b64decode(req.text),'utf-8')
-        #else:
-        #    print("unenc")
-        #    raw = req.text
-
-#        print(raw)
-
-        #header_parts = raw.split("\r\n\r\n")[0].split("\r\n")[1:]
-        #header = {}
-        #for r in header_parts:
-
-        #    header[r.split(":")[0]] = r.split(":")[1].strip()
-
-        #print(header)
+    def code(self, parsed):
+        #TODO: Rework to look at method and call requests acordingly
+        if not self.options.output:
+            self.options.output = "./run.py"
+        t = Reader.Read("{0}/template.pyt".format(os.path.dirname(__file__)))
+        t = Reader.Substitute(t,"@@URL",Reader.ToCode(parsed[0].request.uri))
+        t = Reader.Substitute(t,"@@HEADER",Reader.ToCode(parsed[0].request.HeaderNoCookies()))
+        t = Reader.Substitute(t,"@@COOKIES",Reader.ToCode(parsed[0].request.cookies))
+        t = Reader.Substitute(t,"@@QUERY",Reader.ToCode(parsed[0].request.query))
+        t = Reader.Substitute(t,"@@DATA",Reader.ToCode(parsed[0].request.body))
+        Writer.Replace(self.options.output,t)
+        print("Python Script Written to: {0}".format(self.options.output))

@@ -1,5 +1,6 @@
 import base64
 import urllib.parse
+import json
 
 
 
@@ -11,13 +12,20 @@ class KV(object):
 
 class Request(object):
 
-    def __init__(self,raw):
-        self.raw = raw
+    def __init__(self,raw,url):
+        self.uri = url.split("?")[0]
         self.header = Parser.HeaderFromRaw(raw)
         self.cookies = Parser.CookiesFromHeader(self.header["Cookie"]) if "Cookie" in self.header.keys() else {}
-        #self.header
-        #self.cookies
-        #self.body string
+        self.query = {} if len(url.split("?")) == 1 else parse_qs(url.split("?")[1])
+        self.body = Parser.BodyFromRaw(raw,self.header)
+
+    def HeaderNoCookies(self):
+        d =  {}
+        for k,v in self.header.items():
+            if k != "Cookie":
+                d[k] = v
+        return d
+
 
 class Response(object):
 
@@ -25,8 +33,8 @@ class Response(object):
         self.raw = raw
         self.header = Parser.HeaderFromRaw(raw)
         self.cookies = Parser.CookiesFromHeader(self.header["Set-Cookie"]) if "Set-Cookie" in self.header.keys() else {}
+        self.body = Parser.BodyFromRaw(raw,self.header)
 
-        #self.body
 
 
 class Log(object):
@@ -43,7 +51,7 @@ class Log(object):
         self.length = Parser.Get(item,"responselength")
         self.mime = Parser.Get(item,"mimetype")
         self.extension = Parser.Get(item,"extension")
-        self.request = Request(Parser.Get(item,"request"))
+        self.request = Request(Parser.Get(item,"request"),self.url)
         self.response = Response(Parser.Get(item,"response"))
 
 class Parser(object):
@@ -68,44 +76,58 @@ class Parser(object):
                 else:
                     return el.text
         return ""
-    @staticmethod
-    def HeaderFromRaw(raw):
-        header_parts = raw.split("\r\n\r\n")[0].split("\r\n")[1:]
-        header = {}
-        for r in header_parts:
-            header[r.split(":")[0]] = r.split(":")[1].strip()
+
 
     @staticmethod
     def HeaderFromRaw(raw):
-        header_parts = raw.split("\r\n\r\n")[0].split("\r\n")[1:]
-        header = {}
+        header_parts, x = Parser.HttpSplit(raw)
+        header={}
         for r in header_parts:
-
             parts = r.split(":")
             k = parts[0]
             v = ":".join(parts[1:])
-
             if k == "Set-Cookie":
                 if k in header.keys():
                     header[k].append(v.strip())
                 else:
                     header[k] = [v.strip()]
-            else :
+            else:
                 header[k] = v.strip()
         return header
 
+    @staticmethod
+    def BodyFromRaw(raw,header):
+        ct = header["Content-Type"] if "Content-Type" in header.keys() else "default"
+        x, body = Parser.HttpSplit(raw)
+        if body != None:
+            try:
+                if ct.find("application/json") > -1:
+                    return json.loads(body)
+                if ct.find("application/x-www-form-urlencoded") > -1:
+                    return parse_qs(body)
+                if len(body) == 0:
+                    return None
+                return body
+            except Exception as e:
+                return body
+        return None
 
-    def BodyFromRaw(raw,t):
+
+    @staticmethod
+    def HttpSplit(raw):
         parts = raw.split("\r\n\r\n")
-        if t == "raw":
-            return raw
-        if t == "form":
-            return raw
-        if t == "multi":
-            return raw
-        if t == "json":
-            return raw
+        if  len(parts) > 2:
+            parts = [parts[0],"\r\n\r\n".join(parts[1:])]
+        if len(parts) < 2:
+            parts = raw.split("\n\n")
+        if len(parts) > 2:
+            parts = [parts[0],"\n\n".join(parts[1:])]
 
+        header_parts = parts[0].split("\r\n")[1:]
+        if len(header_parts) < 2:
+            header_parts = parts[0].split("\n")[1:]
+
+        return (header_parts,parts[1] if len(parts) > 1 else None)
 
     @staticmethod
     def CookiesFromHeader(header_cookie):

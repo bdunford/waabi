@@ -3,6 +3,7 @@ import waabi
 import waabi.proxy
 import waabi.scan
 import waabi.belch
+import waabi.utility
 from .globals import Globals
 from .core import Options
 

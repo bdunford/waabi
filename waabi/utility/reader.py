@@ -25,4 +25,20 @@ class Reader(object):
         xdoc = ET.parse(filepath)
         return xdoc.getroot()
 
+    @staticmethod
+    def Substitute(content, target, value):
+        content = content.replace(target,value)
+        return content
 
+
+    @staticmethod
+    def ToCode(obj):
+        if isinstance(obj,str):
+            if obj.find("\n") > -1:
+                return '"""\n{0}\n"""'.format(obj)
+            else:
+                return '"{0}"'.format(obj)
+        elif obj == None:
+            return "None"
+        else:
+            return json.dumps(obj,indent=4)
