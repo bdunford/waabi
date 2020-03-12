@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 class Reader(object):
 
     @staticmethod
-    def Wordlist(filepath):
+    def List(filepath):
         with open(filepath,'r') as r:
             return r.read().split("\n")
 

@@ -10,6 +10,8 @@ import os
 class Belch(Base):
 
     def Init(self):
+        if self.options.parameter not in ["header","code","parse"]:
+            raise ValueError("Invalid Action parameter")
         if not self.options.input:
             raise ValueError("Missing required option -i Burp xml export ")
         self._burp_xml = Reader.Xml(self.options.input)
@@ -24,6 +26,7 @@ class Belch(Base):
             self.header(parsed)
         if self.options.parameter == "code":
             self.code(parsed)
+
 
     def header(self, parsed):
         if not self.options.output:

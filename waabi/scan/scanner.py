@@ -6,6 +6,7 @@ from waabi.core import Base
 from waabi.utility.reader import Reader
 from waabi.utility.threads import Threader
 from waabi.utility.writer import Writer
+from waabi.utility.wordlist import WordList
 import time
 requests.packages.urllib3.disable_warnings()
 
@@ -14,18 +15,18 @@ class Scanner(Base):
 
     def Init(self):
         if self.options.wordlist:
-            self._wl = Reader.Wordlist(self.options.wordlist)
+            self._wl = Reader.List(self.options.wordlist)
         else:
-            self._wl = Reader.Wordlist(os.path.join(waabi.globals.wordlist_path,"web-common.txt"))
+            self._wl = WordList.Get("web-common")
 
         if not self.options.output:
             self.options.output = "./dirscan.txt"
-        
+
         if self.options.header:
             self._header = Reader.Json(self.options.header)
-        else: 
-            self._header = waabi.globals.default_header 
-        
+        else:
+            self._header = waabi.globals.default_header
+
         self.options.header = {}
         self._counter = 0
         self._errors = 0
@@ -47,7 +48,7 @@ class Scanner(Base):
             t.start()
             elapsed = time.gmtime(time.time() - s)
             final = self.update_display(True)
-            
+
             Writer.Replace(self.options.output,final)
 
 

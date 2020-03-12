@@ -4,12 +4,15 @@ import waabi.proxy
 import waabi.scan
 import waabi.belch
 import waabi.utility
+import waabi.wordlists
 from .globals import Globals
 from .core import Options
 
+waabi.globals = Globals()
+
+
 def main():
     opts = Options.Get()
-    waabi.globals = Globals()
 
     #fit into new model
     if opts.action == "proxy":
@@ -21,6 +24,10 @@ def main():
 
     if opts.action == "belch":
         belch.Belch(opts)
+
+    if opts.action == "wordlist":
+        wordlists.WordLists(opts)
+
 
 
 
