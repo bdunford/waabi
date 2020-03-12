@@ -2,6 +2,8 @@
 ''
 '''
 ''''
+’
+‘
 admin' --
 admin' #
 admin' /*
@@ -15,7 +17,7 @@ admin' /*
 ; RAISERROR (15600,-1,-1, 'mysp_CreateCustomer');#
 '; RAISERROR (15600,-1,-1, 'mysp_CreateCustomer');#
 <img
-<img src="https://<HOME>" 
+<img src="https://<HOME>"
 <br />
 <script
 />
