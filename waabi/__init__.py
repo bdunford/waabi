@@ -25,7 +25,7 @@ def main():
     if opts.action == "belch":
         belch.Belch(opts)
 
-    if opts.action == "wordlist":
+    if opts.action == "wordlists":
         wordlists.WordLists(opts)
 
 

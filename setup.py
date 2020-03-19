@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='waabi',
-    version='0.1',
+    version='0.2.1',
     description='waabi is an Ojibwe Word for "s/he has vision, sees"',
     url='https://github.com/bdunford/waabi/',
     author='b1rch',
@@ -16,7 +16,7 @@ setup(name='waabi',
         'waabi/utility',
         'waabi/wordlists'
     ],
-    package_data={'waabi/wordlists':['*.txt']},
+      package_data={'waabi/wordlists':['*.txt'],"waabi/belch":["*.pyt"]},
     zip_safe=False,
     scripts=['bin/waabi'],
     install_requires=[

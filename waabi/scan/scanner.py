@@ -39,7 +39,7 @@ class Scanner(Base):
 
     def Run(self):
             s = time.time()
-            t = Threader(75,self.results)
+            t = Threader(25,self.results)
 
             for w in self._wl:
                 url = self.build_url(w)

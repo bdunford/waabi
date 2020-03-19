@@ -15,8 +15,8 @@ class Request(object):
     def __init__(self,raw,url):
         self.uri = url.split("?")[0]
         self.header = Parser.HeaderFromRaw(raw)
-        self.cookies = Parser.CookiesFromHeader(self.header["Cookie"]) if "Cookie" in self.header.keys() else {}
-        self.query = {} if len(url.split("?")) == 1 else parse_qs(url.split("?")[1])
+        self.cookies = Parser.CookiesFromHeader(self.header["Cookie"]) if "Cookie" in self.header.keys() else None
+        self.query = None if len(url.split("?")) == 1 else urllib.parse.parse_qs(url.split("?")[1])
         self.body = Parser.BodyFromRaw(raw,self.header)
 
     def HeaderNoCookies(self):
@@ -101,12 +101,12 @@ class Parser(object):
         x, body = Parser.HttpSplit(raw)
         if body != None:
             try:
+                if len(body) == 0:
+                    return None
                 if ct.find("application/json") > -1:
                     return json.loads(body)
                 if ct.find("application/x-www-form-urlencoded") > -1:
-                    return parse_qs(body)
-                if len(body) == 0:
-                    return None
+                    return urllib.parse.parse_qs(body)
                 return body
             except Exception as e:
                 return body

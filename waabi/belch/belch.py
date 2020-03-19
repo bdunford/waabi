@@ -23,26 +23,26 @@ class Belch(Base):
     def Run(self):
         parsed = Parser.ParseBurpLog(self._burp_xml)
         if self.options.parameter == "header":
-            self.header(parsed)
+            self.header(parsed[0])
         if self.options.parameter == "code":
-            self.code(parsed)
+            self.code(parsed[0])
+        
 
-
-    def header(self, parsed):
+    def header(self, record):
         if not self.options.output:
             self.options.output = "./header.json"
-        Writer.Json(self.options.output,parsed[0].request.header)
+        Writer.Json(self.options.output,record.request.header)
         print("Header Written to: {0}".format(self.options.output))
 
-    def code(self, parsed):
-        #TODO: Rework to look at method and call requests acordingly
+    def code(self, record):
         if not self.options.output:
             self.options.output = "./run.py"
         t = Reader.Read("{0}/template.pyt".format(os.path.dirname(__file__)))
-        t = Reader.Substitute(t,"@@URL",Reader.ToCode(parsed[0].request.uri))
-        t = Reader.Substitute(t,"@@HEADER",Reader.ToCode(parsed[0].request.HeaderNoCookies()))
-        t = Reader.Substitute(t,"@@COOKIES",Reader.ToCode(parsed[0].request.cookies))
-        t = Reader.Substitute(t,"@@QUERY",Reader.ToCode(parsed[0].request.query))
-        t = Reader.Substitute(t,"@@DATA",Reader.ToCode(parsed[0].request.body))
+        t = Reader.Substitute(t,"@@URL",Reader.ToCode(record.request.uri))
+        t = Reader.Substitute(t,"@@METHOD",Reader.ToCode(record.method))
+        t = Reader.Substitute(t,"@@HEADER",Reader.ToCode(record.request.HeaderNoCookies()))
+        t = Reader.Substitute(t,"@@COOKIES",Reader.ToCode(record.request.cookies))
+        t = Reader.Substitute(t,"@@QUERY",Reader.ToCode(record.request.query))
+        t = Reader.Substitute(t,"@@DATA",Reader.ToCode(record.request.body))
         Writer.Replace(self.options.output,t)
         print("Python Script Written to: {0}".format(self.options.output))
