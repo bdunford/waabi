@@ -8,11 +8,16 @@ class Reader(object):
     @staticmethod
     def List(filepath):
         with open(filepath,'r') as r:
-            return r.read().split("\n")
+            return r.read().strip("\n").split("\n")
 
     @staticmethod
     def Read(filepath):
         with open(filepath,'r') as r:
+            return r.read()
+
+    @staticmethod
+    def ReadBytes(filepath):
+        with open(filepath,'rb') as r:
             return r.read()
 
     @staticmethod
@@ -31,14 +36,4 @@ class Reader(object):
         return content
 
 
-    @staticmethod
-    def ToCode(obj):
-        if isinstance(obj,str):
-            if obj.find("\n") > -1:
-                return '"""\n{0}\n"""'.format(obj)
-            else:
-                return '"{0}"'.format(obj)
-        elif obj == None:
-            return "None"
-        else:
-            return json.dumps(obj,indent=4)
+

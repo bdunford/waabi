@@ -2,46 +2,48 @@ import os
 import sys
 import waabi
 import requests
+import requests_html
 from waabi.core import Base
-from waabi.utility.reader import Reader
 from waabi.utility.threads import Threader
 from waabi.utility.writer import Writer
-from waabi.utility.wordlist import WordList
 import time
 requests.packages.urllib3.disable_warnings()
 
 
-class Scanner(Base):
-
+class Crawler(Base):
+    
     def Init(self):
-        if self.options.wordlist:
-            self._wl = Reader.List(self.options.wordlist)
-        else:
-            self._wl = WordList.Get("web-common")
+        """ we are gonna use a few methods.  
+           
+           Links
+           we will use html requests html render
+           we will use regex
+
+           Forms and Get parameters
+           We will capture this info and us it to detirmin interesting routes
+
+    """
+
+        #action = 'crawl'
+        #param = 'url'
+        #o writes results 
 
         if not self.options.output:
-            self.options.output = "./dirscan.txt"
+            self.options.output = "./craler.txt"
 
         if self.options.header:
             self._header = Reader.Json(self.options.header)
         else:
             self._header = waabi.globals.default_header
 
-        if not self.options.threads:
-            self.options.threads = 5
-
-        self._counter = 0
-        self._errors = 0
-        self._found = []
-        self._counts = {}
 
 
     def Help(self):
-        return "scan [url] [options: -o output, -w wordlist, -H header.json -t 5]"
+        return "crawl [url] [options: -o output, -H header.json]"
 
     def Run(self):
             s = time.time()
-            t = Threader(self.options.threads,self.results)
+            t = Threader(15,self.results)
 
             for w in self._wl:
                 url = self.build_url(w)
@@ -50,7 +52,6 @@ class Scanner(Base):
             t.start()
             elapsed = time.gmtime(time.time() - s)
             final = self.update_display(True)
-            print(t.errors)
 
             Writer.Replace(self.options.output,final)
 
@@ -64,7 +65,7 @@ class Scanner(Base):
     def req(self,url):
         try:
             r = requests.get(url, headers=self._header, verify=False,timeout=5)
-            return {"url" : url, "status" : r.status_code, "length": len(r.text)}
+            return {"url" : url, "status" : r.status_code, "length": int(r.headers["content-length"])}
         except Exception as ex:
             return {"url" : url, "status" : 999, "length": 0}
 
@@ -76,7 +77,7 @@ class Scanner(Base):
                     self._found.append(r)
                     self.update_counts(r)
             self._counter += 1
-            if (self._counter % self.options.threads == 0):
+            if (self._counter % 100 == 0):
                 self.update_display(False)
 
     def update_counts(self,r):

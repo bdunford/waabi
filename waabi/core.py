@@ -10,7 +10,7 @@ class Options(object):
             prog="waabi",
             usage="%(prog)s [action] [parameter] [options]"
         )
-        parser.add_argument("action", help="Action to perform [scan | belch | proxy | crawl]")
+        parser.add_argument("action", help="Action to perform [scan | belch | payloads | wordlists]")
         parser.add_argument("parameter", help="Action parameter either a URL / Input file / Port")
 
         #optional commands
@@ -36,6 +36,13 @@ class Options(object):
             "-i",
             dest="input",
             help="Input file to be loaded for Parsing"
+        )
+
+        parser.add_argument(
+            "-t",
+            dest="threads",
+            type=int,
+            help="Number of Threads for Requests"
         )
 
         options = parser.parse_args()

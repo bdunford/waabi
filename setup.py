@@ -14,14 +14,41 @@ setup(name='waabi',
         'waabi/belch',
         'waabi/scan',
         'waabi/utility',
-        'waabi/wordlists'
+        'waabi/wordlists',
+        'waabi/payloads'
     ],
-      package_data={'waabi/wordlists':['*.txt'],"waabi/belch":["*.pyt"]},
+    package_data={
+        "waabi/wordlists":["*.txt"],
+        "waabi/belch":["*.pyt"],
+        "waabi/payloads":[
+            "*.xml",
+            "*.sql",
+            "*.ql",
+            "*.xlsx",
+            "*.xlsm",
+            "*.xls",
+            "*.doc",
+            "*.docx",
+            "*.svg",
+            "*.html",
+            "*.jpeg",
+            "*.pdf",
+            "*.gif",
+            "*.bmp",
+            "*.ico",
+            "*.tiff",
+            "*.png",
+            "*.txt",
+            "*.rtf",
+            "*.json"
+        ]
+    },
     zip_safe=False,
     scripts=['bin/waabi'],
     install_requires=[
         'requests',
         'requests-html',
-        'proxy.py'
+        'proxy.py',
+        'pyjwt'
     ]
 )

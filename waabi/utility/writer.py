@@ -6,17 +6,17 @@ class Writer(object):
 
     @staticmethod
     def Append(filepath, content, add_new_line=True):
-
+        o = 'ab' if isinstance(content,bytes) else 'a'
         Writer.EnsureFilePath(filepath)
-        with open(filepath,'a') as w:
+        with open(filepath,o) as w:
             w.write(content + '\n')
             w.close()
 
     @staticmethod
-    def Replace(filepath, content):
-
+    def Replace(filepath, content): 
+        o = 'wb' if isinstance(content,bytes) else 'w'
         Writer.EnsureFilePath(filepath)
-        with open(filepath,'w') as w:
+        with open(filepath,o) as w:
             w.write(content)
             w.close()
 

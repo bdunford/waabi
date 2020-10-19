@@ -1,3 +1,4 @@
 requests
 requests-html
 proxy.py
+pyjwt

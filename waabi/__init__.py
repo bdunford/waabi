@@ -5,6 +5,7 @@ import waabi.scan
 import waabi.belch
 import waabi.utility
 import waabi.wordlists
+import waabi.payloads
 from .globals import Globals
 from .core import Options
 
@@ -27,6 +28,9 @@ def main():
 
     if opts.action == "wordlists":
         wordlists.WordLists(opts)
+    
+    if opts.action == "payloads":
+        payloads.Payloads(opts)
 
 
 

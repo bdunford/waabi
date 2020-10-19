@@ -1,8 +1,8 @@
 import base64
 import urllib.parse
 import json
-
-
+import re
+from waabi.utility.to import To
 
 class KV(object):
     def __init__(self,k,v):
@@ -13,16 +13,20 @@ class KV(object):
 class Request(object):
 
     def __init__(self,raw,url):
+        
+        self.raw = raw
+        header, body, line = Parser.HttpSplit(raw)
+        self.line = line
         self.uri = url.split("?")[0]
-        self.header = Parser.HeaderFromRaw(raw)
+        self.header = Parser.HeaderFromSplit(header)
         self.cookies = Parser.CookiesFromHeader(self.header["Cookie"]) if "Cookie" in self.header.keys() else None
         self.query = None if len(url.split("?")) == 1 else urllib.parse.parse_qs(url.split("?")[1])
-        self.body = Parser.BodyFromRaw(raw,self.header)
+        self.body = Parser.BodyFromSplit(body,self.header)
 
     def HeaderNoCookies(self):
         d =  {}
         for k,v in self.header.items():
-            if k != "Cookie":
+            if k.lower() != "cookie":
                 d[k] = v
         return d
 
@@ -31,10 +35,12 @@ class Response(object):
 
     def __init__(self,raw):
         self.raw = raw
-        self.header = Parser.HeaderFromRaw(raw)
+        header, body, line = Parser.HttpSplit(raw)
+        
+        self.line = line
+        self.header = Parser.HeaderFromSplit(header)
         self.cookies = Parser.CookiesFromHeader(self.header["Set-Cookie"]) if "Set-Cookie" in self.header.keys() else {}
-        self.body = Parser.BodyFromRaw(raw,self.header)
-
+        self.body = Parser.BodyFromSplit(body,self.header) 
 
 
 class Log(object):
@@ -46,7 +52,9 @@ class Log(object):
         self.port = Parser.Get(item,"port")
         self.protocol = Parser.Get(item,"protocol")
         self.url = Parser.Get(item,"url")
-        self.path = Parser.Get(item,"path")
+        fpp = Parser.Get(item,"path").split("?")
+        self.path = fpp[0]
+        self.query = fpp[1] if len(fpp) > 1 else None
         self.status = Parser.Get(item,"status")
         self.length = Parser.Get(item,"responselength")
         self.mime = Parser.Get(item,"mimetype")
@@ -72,15 +80,14 @@ class Parser(object):
                 return el.get(attr)
             if el.text != None:
                 if el.get("base64") == "true":
-                    return str(base64.b64decode(el.text),'utf-8')
+                    return base64.b64decode(el.text)
                 else:
                     return el.text
         return ""
 
 
     @staticmethod
-    def HeaderFromRaw(raw):
-        header_parts, x = Parser.HttpSplit(raw)
+    def HeaderFromSplit(header_parts):
         header={}
         for r in header_parts:
             parts = r.split(":")
@@ -96,38 +103,71 @@ class Parser(object):
         return header
 
     @staticmethod
-    def BodyFromRaw(raw,header):
-        ct = header["Content-Type"] if "Content-Type" in header.keys() else "default"
-        x, body = Parser.HttpSplit(raw)
+    def BodyFromSplit(body,header):
+        ct = "default"
+        for k in header.keys():
+            if k.lower() == "content-type":
+                ct = header[k]
         if body != None:
             try:
                 if len(body) == 0:
                     return None
-                if ct.find("application/json") > -1:
+                if ct.lower().find("application/json") > -1:
                     return json.loads(body)
-                if ct.find("application/x-www-form-urlencoded") > -1:
-                    return urllib.parse.parse_qs(body)
+                if ct.lower().find("application/x-www-form-urlencoded") > -1:
+                    parsed = urllib.parse.parse_qs(body)
+                    if parsed:
+                        return parsed
                 return body
             except Exception as e:
+                #TODO: total error and print and include in load results
+                #raise(e)
                 return body
         return None
 
 
     @staticmethod
     def HttpSplit(raw):
-        parts = raw.split("\r\n\r\n")
-        if  len(parts) > 2:
-            parts = [parts[0],"\r\n\r\n".join(parts[1:])]
-        if len(parts) < 2:
-            parts = raw.split("\n\n")
-        if len(parts) > 2:
-            parts = [parts[0],"\n\n".join(parts[1:])]
+        if raw =="":
+            return "","",""
+        try:
+        
+            cr = "\r\n" 
+            n =  "\n"
 
-        header_parts = parts[0].split("\r\n")[1:]
-        if len(header_parts) < 2:
-            header_parts = parts[0].split("\n")[1:]
+            if isinstance(raw,bytes):
+                cr = cr.encode()
+                n  = n.encode()
 
-        return (header_parts,parts[1] if len(parts) > 1 else None)
+            parts = raw.split(cr * 2)
+            if  len(parts) > 2:
+                parts = [parts[0],(cr * 2).join(parts[1:])]
+            if len(parts) < 2:
+                parts = raw.split(n * 2)
+            if len(parts) > 2:
+                parts = [parts[0],(n * 2).join(parts[1:])]
+
+
+            header_parts = list(map(lambda x: str(x,'utf-8') if isinstance(x,bytes) else x,parts[0].split(cr)))
+
+            if len(header_parts) < 2:
+                header_parts = parts[0].split(n)
+        
+            first_line = header_parts[0]
+            header_parts = header_parts[1:]
+
+            body = None
+        
+            if len(parts[1]) > 1:
+                try: 
+                    body = str(parts[1],'utf-8') if isinstance(parts[1],bytes) else parts[1]
+                except:
+                    body = parts[1]
+        
+            return (header_parts,body,first_line)
+        except Exception as e:
+            print(raw)
+            raise e
 
     @staticmethod
     def CookiesFromHeader(header_cookie):
@@ -154,7 +194,38 @@ class Parser(object):
         parts = c.split("=")
         k = c.split("=")[0].strip()
         if len(parts) > 1:
-            v = urllib.parse.unquote(c.split("=")[1].strip())
+            v = "=".join(c.split("=")[1:]).strip()
         else:
-            v = True
+            v = ""
         return KV(k,v)
+    
+    @staticmethod
+    def FindJWTs(raw): 
+        ret = []    
+        ptrn = "[A-Za-z0-9\+\/]{10,}\=*\.[A-Za-z0-9\+\/]{25,}\=*\.[A-Za-z0-9\+\/\=\_\-]*"  
+        d = "."
+        if isinstance(raw,bytes):
+            ptrn = ptrn.encode()
+            d = d.encode()
+        
+        results = re.findall(ptrn,raw)
+        for r in set(results):
+            
+            try:
+                parts = [To.String(x) + "===" for x in r.split(d)]
+                jwt = {
+                    "alg": json.loads(base64.b64decode(parts[0])),
+                    "payload": json.loads(base64.b64decode(parts[1])),
+                    "encoded": To.String(r)
+                }
+                ret.append(jwt)
+            except Exception as e:
+                pass
+        return ret if len(ret) > 0 else None
+        
+                   
+                    
+
+        
+
+         

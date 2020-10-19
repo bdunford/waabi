@@ -8,3 +8,6 @@ curl-tests
 .waabi
 dirscan.txt
 tests
+tests.sh
+examples
+builders

