@@ -16,9 +16,10 @@ class Belch(Base):
         if not self.options.input:
             raise ValueError("Missing required option -i Burp xml export ")
         self._burp_xml = Reader.Xml(self.options.input)
-
-    def Help(self):
-        return "belch [header|code|cli] [options: -i burp xml export , -o output]"
+    
+    @staticmethod
+    def Help():
+        return ("Burp proxy log parser with a whole lot more...","belch [header|code|cli] [options: -i burp xml export , -o output]")
 
     def Run(self):
         parsed = Parser.ParseBurpLog(self._burp_xml)

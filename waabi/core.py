@@ -1,17 +1,18 @@
 import argparse
 import sys
+import waabi
 
 class Options(object):
 
     @staticmethod
-    def Get():
+    def Get(actions):
 
         parser = argparse.ArgumentParser(
             prog="waabi",
             usage="%(prog)s [action] [parameter] [options]"
         )
-        parser.add_argument("action", help="Action to perform [scan | belch | payloads | wordlists]")
-        parser.add_argument("parameter", help="Action parameter either a URL / Input file / Port")
+        parser.add_argument("action", help="Action to perform [{0}]".format("|".join(actions)))
+        parser.add_argument("parameter", help="Action parameter a command or parmaeter that directory supports the action.")
 
         #optional commands
         parser.add_argument(
@@ -51,7 +52,6 @@ class Options(object):
 
 
 class Base(object):
-
     def __init__(self,options):
         self.options = options
         try:
@@ -59,6 +59,6 @@ class Base(object):
         except Exception as e:
             print("{0}: {1} Failed to Initialize........".format(self.options.action,self.options.parameter))
             print(e)
-            print(self.Help())
+            waabi.print_help(self.Help())
             sys.exit()
         self.Run()

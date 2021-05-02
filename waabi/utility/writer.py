@@ -24,7 +24,7 @@ class Writer(object):
     def Json(filepath, content):
 
         Writer.EnsureFilePath(filepath)
-        j = json.dumps(content,indent=4)
+        j = json.dumps(content,indent=2)
         with open(filepath,'w') as w:
             w.write(j)
             w.close()

@@ -37,11 +37,12 @@ class Cli(Cmd):
     def do_view(self,args):
         """
             View specific burp log, optionally include full response body
-            Usage: view [log number] [full] [highlight as regex]\n
+            Usage: view [log number] [full] [highlight as regex] [skip] [take]\n
             Examples: view 123
                       view 123 full
                       view 123 w1ndsor
                       view 123 full \<script.*?\<\/script\>
+                      view 123 full 10 15
 
         """
         if not self.ctlr.view_cmd(args):
@@ -169,7 +170,7 @@ class Cli(Cmd):
 
     def do_fuzz(self,args):
         """
-        Fuzz a request against a list of common problem causing strings
+        Fuzz a series of requests against a full list of common problem causing strings
         Usage: fuzz [log number] parameter [template] [find]
         Examples: fuzz 123 query.id
                   fuzz 123 path test/{0}/route 
@@ -178,7 +179,51 @@ class Cli(Cmd):
         if not self.ctlr.fuzz_cmd(args):
             self._invalid("fuzz")
 
+    def do_quick(self,args):
+        """
+        Quick a series of requests against a small list of common problem causing strings
+        Usage: quick [log number] parameter [template] [find]
+        Examples: quick 123 query.id
+                  quick 123 path test/{0}/route 
+                  quick 123 path 554324
+        """
+        if not self.ctlr.quick_cmd(args):
+            self._invalid("quick")
+    
+    def do_chars(self,args):
+        """
+        Chars a series of requests against a list of each url encoded char 00 - ff
+        Usage: chars [log number] parameter [template] [find]
+        Examples: chars 123 query.id
+                  chars 123 path test/{0}/route 
+                  chars 123 path 554324
+        """
+        if not self.ctlr.chars_cmd(args):
+            self._invalid("chars")
 
+    def do_sqli(self,args):
+        """
+        SQLi a series of requests against a list of sql injection strings
+        Usage: sqli [log number] parameter [template] [find]
+        Examples: sqli 123 query.id
+                  sqli 123 path test/{0}/route 
+                  sqli 123 path 554324
+        """
+
+        if not self.ctlr.sqli_cmd(args):
+            self._invalid("sqli")
+
+    def do_traversal(self,args):
+        """
+        Traversal a series of requests against a list of directory traversal strings
+        Usage: traversal [log number] parameter [template] [find]
+        Examples: traversal 123 query.id
+                  traversal 123 path test/{0}/route 
+                  traversal 123 path 554324
+        """
+
+        if not self.ctlr.traversal_cmd(args):
+            self._invalid("sqli")
     
     def do_permutate(self,args):
         """
@@ -199,11 +244,12 @@ class Cli(Cmd):
     def do_result(self,args):
         """
         Dispay specific result from replay, optionally include full response body
-        Usage: result [result number] [full] [highlight as regex]\n
+        Usage: result [result number] [full] [highlight as regex] [skip] [take]\n
         Examples: result 123
                   result 123 full
                   result 123 full w1ndsor
                   result 123 full \<script.*?\<\/script\>
+                  result 123 full 10 5
         """
         if not self.ctlr.result_cmd(args):
             self._invalid("result")
@@ -247,4 +293,19 @@ class Cli(Cmd):
         """
         if not self.ctlr.parameters_cmd(args):
             self._invalid("parameters")
+
+    def do_hunt(self,args):
+        """
+        Search for interesting requests, responses, headers, cookies. All things that might be worth taking a deeper look at. 
+        Usage hunt [optional category - paths headers whatever]
+        sub commands "paths, headers, reflected, cookies,"
+        """
+
+        if not self.ctlr.hunt_cmd(args):
+            self._invalid("hunt")
+
+
+
+
+
                 

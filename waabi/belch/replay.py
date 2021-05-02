@@ -46,7 +46,7 @@ class Replay(object):
             del req["headers"][k]
         return req
         
-
+    
     def _method_change(self,req,log,flip):
         f = log.method.upper()
         t = req["method"].upper()
@@ -60,13 +60,14 @@ class Replay(object):
                         req["query"][k] = v
                 req["body"] = None
                 req = self._remove_headers(req,["content-type","content-length"])
-            if f == "GET" and t == "POST":
-                                
-                pass
-
-        else:
-            #here we add some header manipulation if we start seeing lots of issues
-            pass
+            if f == "GET" and t in ("POST","PUT"):
+                if isinstance(req["query"],dict):
+                    req["body"] = {} if not req["body"] else req["body"]
+                    for k,v in req["query"].items():
+                        req["body"][k] = v
+                req["query"] = None
+                req["headers"]["Content-Type"] = "application/x-www-form-urlencoded"
+             
         return req
     
     def _pv_opts(self,pv_opts):
@@ -80,7 +81,18 @@ class Replay(object):
                     else:
                         find = o
         return find,template
- 
+
+    def _prepare_value(self,source,value,find):
+        if isinstance(source,list):
+            if len(source) == 1: 
+                value = value.replace("{base}",source[0])
+                value = source[0].replace(find,value) if find else value
+        else: 
+            value = value.replace("{base}",source)
+            value = source.replace(find,value) if find else value
+
+        return value            
+
 
     def Repeat(self,i,log,label,parameters,values,pv_opts,meta_opts,on_success,on_fail):
         pvl = []
@@ -121,7 +133,7 @@ class Replay(object):
                     for i in range(len(pt)): 
                         if pt[i] in v.keys():
                             if i == len(pt) - 1:
-                                v[pt[i]] = v[pt[i]].replace(find,value) if find else value
+                                v[pt[i]] = self._prepare_value(v[pt[i]],value,find)
                             else:
                                 if v[pt[i]] == None:
                                     v[pt[i]] = {}
@@ -129,10 +141,11 @@ class Replay(object):
                         else: 
                             if i == 0 or i < len(pt) - 1:
                                 raise(Exception("Bad parameter string {0}".format(parameter)))
-                            else: 
-                                v[pt[i]] = v[pt[i]].replace(find,value) if find else value
+                            else:
+                                v[pt[i]] = ""
+                                v[pt[i]] = self._prepare_value(v[pt[i]],value,find)
             o = self._method_change(o,log,flip)
-            query = Html.SmartEncode(o["query"])
+            query = Html.SmartEncode(o["query"]) if self._opt("smart_encode") else o["query"]
             ct = "default"
             for k in o["headers"].keys():
                 if k.lower() == "content-type":

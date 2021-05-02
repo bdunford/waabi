@@ -35,9 +35,9 @@ class Scanner(Base):
         self._found = []
         self._counts = {}
 
-
-    def Help(self):
-        return "scan [url] [options: -o output, -w wordlist, -H header.json -t 5]"
+    @staticmethod
+    def Help():
+        return ("Preform a Directory/File Bruteforce against a given url","scan [url] [options: -o output, -w wordlist, -H header.json -t 5]")
 
     def Run(self):
             s = time.time()

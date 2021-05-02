@@ -14,8 +14,9 @@ class Payloads(Base):
         if not self.options.output:
             self.options.output = "./waabi-payloads/"
 
-    def Help(self):
-        return "payloads [extract | list | (payload name)] [-o output directory]"
+    @staticmethod
+    def Help():
+        return ("Extract or list payload example files","payloads [extract | list | (payload name)] [-o output directory]")
 
     def Run(self):
         if self.options.parameter == "extract":

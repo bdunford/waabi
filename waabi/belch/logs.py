@@ -1,7 +1,7 @@
 from waabi.belch.parser import Parser
 from waabi.utility.reader import Reader
 from waabi.utility.to import To
-
+import re
 
 
 
@@ -57,7 +57,26 @@ class Logs(object):
             if self.is_match(l,terms,pairs):
                 ret.append((i,l))
         return ret
-
+    
+    def Unique(self,field,regex,terms,pairs):
+        results = self.Search(terms,pairs)
+        ret = []
+        for r in results:
+            v = r[1].__dict__[field].raw if field in ['request','response'] else r[1].__dict__[field]
+            if regex:
+                if v: 
+                    if isinstance(v,bytes):
+                        expr = re.compile(regex.encode(),re.IGNORECASE)
+                    else:  
+                        expr = re.compile(regex,re.IGNORECASE)
+                    m = expr.findall(v)
+                    if m:
+                        for x in m: 
+                            ret.append(To.String(x))
+            else: 
+                ret.append(To.String(v))            
+        final = sorted(list(set(ret))) 
+        return final
 
     def Exists(self,log_id):
         return True if log_id <= len(self._logs) else False

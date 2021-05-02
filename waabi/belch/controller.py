@@ -2,6 +2,7 @@ import re
 import traceback
 from waabi.belch.options import Options
 from waabi.belch.logs import Logs
+from waabi.belch.hunt import Hunt
 from waabi.belch.display import Display
 from waabi.belch.arguments import Args, Term
 from waabi.belch.results import Results
@@ -53,6 +54,24 @@ class Controller(object):
             self.display.BR()
             return False
         return True
+
+    def _substitute(self, values):
+        if not values:
+            return values
+        subs = {
+            "@canary_email": self.options.Get("canary_email"),
+            "@canary_url": self.options.Get("canary_url"),
+            "@canary_dns": self.options.Get("canary_dns")
+        }
+        single = not isinstance(values,list)
+        values = [values] if single else values
+        ret = []
+        for v in values:
+            for k,r in subs.items():
+                v = v.replace(k,r)
+            ret.append(v)
+        return ret[0] if single else ret
+            
         
     def _result(self,log_id,rslt_type,pv,res,flag,meta):
         skip = False
@@ -74,6 +93,26 @@ class Controller(object):
                     find = o
         return find,template
     
+    def _fuzz(self,result_type,wordlist_name,raw):
+        try:
+            args = Args(raw,[("log_id",int),("parm",str),("opt1",str),("opt2",str)],2)                
+            if self._validate(args,"log_id"):
+                log = self.logs.Get(args.log_id)
+                self.display.ResultHeader()
+                self.replay.Repeat(
+                    args.log_id,log,result_type,args.parm,
+                    self._substitute(WordList.Get(wordlist_name)),[args.opt1,args.opt2],
+                    [lambda res: (True if res.status_code == 500 else False,None)],
+                    self._result,self.display.Error
+                )
+
+                self.display.BR()
+                return True
+        except:
+            self._error()
+        return False
+
+
     def intro(self,prnt=False):
         x = self.display.Intro(self.logs.source,self.logs.Count())
         if prnt:
@@ -117,35 +156,25 @@ class Controller(object):
         try:
             args = Args(raw,[("log_id",int),("fp",str)],2)
             if self._validate(args,"log_id"):
-                Writer.Replace(args.fp,self.logs.Get(args.log_id).response.body)
+                content = self.logs.Get(args.log_id).response.body
+                if isinstance(content,(list,dict)): 
+                    Writer.Json(args.fp,content)
+                else: 
+                    Writer.Replace(args.fp,content)
                 self.display.Format("Log: {0} Extracted: {1}",True,args.log_id,args.fp)
-                return self._invalid()
+                return True
         except: 
             self._error()
         return False
+
 
     def unique_cmd(self,raw):
         try:
             args = Args(raw,[("field",str),("regex",str)],1,[Term("where",keys=self.logs.Keys(),start="where")])
             if self._validate(args):
-                results = self.logs.Search(args.where.terms,args.where.pairs)
-                ret = []
-                for r in results:
-                    v = r[1].__dict__[args.field].raw if args.field in ['request','response'] else r[1].__dict__[args.field]
-                    if args.regex:
-                        if v: 
-                            if isinstance(v,bytes):
-                                m = re.findall(args.regex.encode(),v)
-                            else: 
-                                m = re.findall(args.regex,v)
-                            if m:
-                                for x in m: 
-                                    ret.append(To.String(x))
-                    else: 
-                        ret.append(To.String(v))            
-                final = sorted(list(set(ret))) 
-                self.display.List(final)
-                self.display.Pair("Results",len(final),True,True)
+                ret = self.logs.Unique(args.field,args.regex,args.where.terms,args.where.pairs)
+                self.display.List(ret)
+                self.display.Pair("Results",len(ret),True,True)
                 return True
         except:
             self._error()
@@ -245,7 +274,7 @@ class Controller(object):
                 if log.response and log.response.raw:
                     x += log.response.raw
                 jwts = Parser.FindJWTs(x)
-                self.display.JWT((args.log_id,log),jwts)
+                self.display.JWT((args.log_id,log),jwts,self.options.Get("canary_url"))
                 return True
         except:
             self._error()
@@ -269,6 +298,7 @@ class Controller(object):
     def reflected_cmd(self,raw):
         try:
             args = Args(raw,[("log_id",int),("parm",str),("val",str),("find",str)],3)                
+            args.val = self._substitute(args.val)
             if self._validate(args,"log_id"):
                 log = self.logs.Get(args.log_id)
                 pv = To.Dict(args.parm,args.val) 
@@ -287,7 +317,8 @@ class Controller(object):
 
     def replay_cmd(self,raw):
         try:
-            args = Args(raw,[("log_id",int),("parm",str),("val",str),("find",str)],1)                
+            args = Args(raw,[("log_id",int),("parm",str),("val",str),("find",str)],1)               
+            args.val = self._substitute(args.val)
             if self._validate(args,"log_id"):
                 log = self.logs.Get(args.log_id)
                 pv = To.Dict(args.parm,args.val) if args.parm else None
@@ -330,8 +361,8 @@ class Controller(object):
                 self.display.ResultHeader()
                 self.replay.Repeat(
                     args.log_id,log,"XSS",args.parm,
-                    WordList.Get("xss"),[args.opt1,args.opt2],
-                    [Html.FindExecJs,"console.log(742)",["onerror","onpointermove","href","src","onload"],self.options.Get("render")],
+                    self._substitute(WordList.Get("xss")),[args.opt1,args.opt2],
+                    [Html.FindExecJs,"console.log(742)",["onerror","onpointermove","href","src","onload","BACKGROUND","STYLE"],self.options.Get("render")],
                     self._result,self.display.Error
                 )
                 self.display.BR()
@@ -341,28 +372,28 @@ class Controller(object):
         return False
 
     def fuzz_cmd(self,raw):
-        try:
-            args = Args(raw,[("log_id",int),("parm",str),("opt1",str),("opt2",str)],2)                
-            if self._validate(args,"log_id"):
-                log = self.logs.Get(args.log_id)
-                self.display.ResultHeader()
-                self.replay.Repeat(
-                    args.log_id,log,"FUZZ",args.parm,
-                    WordList.Get("fuzz"),[args.opt1,args.opt2],
-                    [lambda res: (True if res.status_code == 500 else False,None)],
-                    self._result,self.display.Error
-                )
+        return self._fuzz("FUZZ","fuzz",raw)
 
-                self.display.BR()
-                return True
-        except:
-            self._error()
-        return False
-     
+    def quick_cmd(self,raw):
+        return self._fuzz("QUIK","quick",raw)
+    
+    def chars_cmd(self,raw):
+        return self._fuzz("CHAR","chars",raw)
+
+    def sqli_cmd(self,raw):
+        return self._fuzz("SQLI","sqli",raw)
+
+    def traversal_cmd(self,raw):
+        return self._fuzz("TRVS","traversal",raw)
+
     def permutate_cmd(self,raw):
         try:
             args = Args(raw,[("log_id",int),"ALL",("opt1",str),("opt2",str)],1)
-            print(args.ALL)
+            opts = [
+                self._substitute(args.opt1),
+                self._substitute(args.opt2)
+            ]
+
             if self._validate(args,"log_id"):
                 log = self.logs.Get(args.log_id)
                 orig, err = self.replay.Request(log,None)
@@ -373,11 +404,22 @@ class Controller(object):
                 self._result(args.log_id,"PERM",{"Base Line":""},orig,False,None)
                 self.replay.Repeat(
                     args.log_id,log,"PERM",
-                    self.logs.Permutations(False if args.ALL else args.log_id,[args.opt1,args.opt2]),None,None,
+                    self.logs.Permutations(False if args.ALL else args.log_id,opts),None,None,
                     [Html.Compare,orig], self._result, self.display.Error
                 )
                 self.display.BR()
                 return True
+        except:
+            self._error()
+        return False
+
+    def hunt_cmd(self,raw):
+        try: 
+            args = Args(raw,[("category",str)],0)
+            for k,v in Hunt(self.logs,args.category).results.items():
+                self.display.Header(k)
+                self.display.List(v)
+            return True
         except:
             self._error()
         return False

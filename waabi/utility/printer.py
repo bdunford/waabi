@@ -1,5 +1,6 @@
 import re
 from waabi.utility.finder import Finder 
+import json
 
 class Printer(object):
     @staticmethod
@@ -113,6 +114,8 @@ class Printer(object):
 
     @staticmethod
     def PrintBody(content,highlight=False,skip=0,take=0):
+        if isinstance(content,(dict,list)):
+            content = json.dumps(content,indent=2)
         content = content.replace("\r\n","\n")
         hc = 0
         lines = False

@@ -50,7 +50,10 @@ class Display(object):
     def Dict(self,d, indent=""): 
         for k,v in d.items(): 
             self.P("{0}{1}: {2}".format(indent,k,v))
-    
+
+    def Json(self,mixed):
+        self.P(json.dumps(mixed,indent=2))
+
     def Header(self,title):
         self.BR()
         self.P(title)
@@ -199,20 +202,33 @@ class Display(object):
                     self.Pair("Lines",", ".join(lines))
                 self.BR()
 
-    def JWT(self,record,jwts):
+    def JWT(self,record,jwts,canary):
         self.Log(record)
-        self.BR()
-        self.P("JWT(s):")
-        self.HR()
+        self.Header("JWT(s):")
         if jwts: 
             for jwt in jwts:
-                self.P(jwt["encoded"])
-                self.P(json.dumps(jwt["alg"],indent=2))
-                self.P(json.dumps(jwt["payload"],indent=2))
-                self.BR()
+                self.HR()
+                self.Header("HEADER: ALGORITHM & TOKEN TYPE")
+                self.Json(jwt.header)
+                self.Header("PAYLOAD: DATA")
+                self.Json(jwt.payload)
+                self.Header("SIGNATURE: BASE64")
+                self.P(jwt.signature)
+                self.Header("ENCODED: ORIGIONAL")
+                self.P(jwt.encoded)
+                self.Header("ENCODED: NONE ALGORITHM")
+                self.P(jwt.AsAlgNone())
+                self.Header("ENCODED: HS256 ALGORITHM")
+                self.P(jwt.AsAlgHS256())
+                self.Header("ENCODED: WITH CANARY")
+                self.P(jwt.WithCanaryIss(canary))
+                if len(jwt.errors) > 0:
+                    self.Header("ERRORS: TOKEN PARSING ERRORS")
+                    self.P(jwt.errors)
+
         else: 
            self.P("No JWT's found for this Log...",True)
-
+        self.BR()
 
     def Success(self,message):
         self.P(Printer.Highlighter(message,"green"))    

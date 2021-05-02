@@ -3,6 +3,7 @@ import urllib.parse
 import json
 import re
 from waabi.utility.to import To
+from waabi.utility.jwty import Jwty
 
 class KV(object):
     def __init__(self,k,v):
@@ -203,23 +204,18 @@ class Parser(object):
     def FindJWTs(raw): 
         ret = []    
         ptrn = "[A-Za-z0-9\+\/]{10,}\=*\.[A-Za-z0-9\+\/]{25,}\=*\.[A-Za-z0-9\+\/\=\_\-]*"  
-        d = "."
         if isinstance(raw,bytes):
             ptrn = ptrn.encode()
-            d = d.encode()
-        
+
         results = re.findall(ptrn,raw)
         for r in set(results):
-            
-            try:
-                parts = [To.String(x) + "===" for x in r.split(d)]
-                jwt = {
-                    "alg": json.loads(base64.b64decode(parts[0])),
-                    "payload": json.loads(base64.b64decode(parts[1])),
-                    "encoded": To.String(r)
-                }
-                ret.append(jwt)
-            except Exception as e:
+            try: 
+                if isinstance(r,bytes): 
+                    ret.append(Jwty(r.decode()))
+                else: 
+                    ret.append(Jwty(r))
+            except Exception as ex: 
+                raise ex
                 pass
         return ret if len(ret) > 0 else None
         

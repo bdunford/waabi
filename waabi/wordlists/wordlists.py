@@ -13,8 +13,9 @@ class WordLists(Base):
         if not self.options.output:
             self.options.output = "./waabi-wordlists/"
 
-    def Help(self):
-        return "wordlists [extract list] [-o output directory]"
+    @staticmethod
+    def Help():
+        return ("Extract or list all the wordlists","wordlists [extract list] [-o output directory]")
 
     def Run(self):
         if self.options.parameter == "extract":

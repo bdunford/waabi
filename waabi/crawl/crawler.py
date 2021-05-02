@@ -38,8 +38,9 @@ class Crawler(Base):
 
 
 
-    def Help(self):
-        return "crawl [url] [options: -o output, -H header.json]"
+    @staticmethod
+    def Help():
+        return ("Crawl a Website or API to auto produce burp proxy logs","crawl [url] [options: -o output, -H header.json]")
 
     def Run(self):
             s = time.time()

