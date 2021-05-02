@@ -14,7 +14,6 @@ class Options(object):
         parser.add_argument("action", help="Action to perform [{0}]".format("|".join(actions)))
         parser.add_argument("parameter", help="Action parameter a command or parmaeter that directory supports the action.")
 
-        #optional commands
         parser.add_argument(
             "-H",
             dest="header",
