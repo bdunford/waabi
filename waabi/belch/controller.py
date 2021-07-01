@@ -24,7 +24,7 @@ class Controller(object):
         self.replay = Replay(self.options)
         self.proxies = {
             "http" : "http://127.0.0.1:8080",
-            "https" : "https://127.0.0.1:8080"
+            "https" : "http://127.0.0.1:8080"
         } 
         
     def _error(self):
