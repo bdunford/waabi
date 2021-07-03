@@ -53,10 +53,8 @@ class Hunt(object):
             return None
         for key,val in params.items():
             vals = val if isinstance(val,list) else [val]
-            for v in vals: 
-                v = v if not isinstance(v,bytes) else v.decode()
-                v = v if isinstance(v,str) else json.dumps(v)
-                if body.find(v) > -1:
+            for v in vals:
+               if body.find(str(v)) > -1:
                     if key in ret.keys():
                         if isinstance(ret[key],list):
                             ret[key].append(val)
