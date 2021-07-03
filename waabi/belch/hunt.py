@@ -57,11 +57,11 @@ class Hunt(object):
                if body.find(str(v)) > -1:
                     if key in ret.keys():
                         if isinstance(ret[key],list):
-                            ret[key].append(val)
+                            ret[key].append(str(val))
                         else:
                             ret[key] = [ret[key],str(val)]
                     else: 
-                        ret[key] = val
+                        ret[key] = str(val)
         return ret
     
     #remove duplicates keep best score
