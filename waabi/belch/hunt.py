@@ -59,7 +59,7 @@ class Hunt(object):
                         if isinstance(ret[key],list):
                             ret[key].append(val)
                         else:
-                            ret[key] = [ret[key],val]
+                            ret[key] = [ret[key],str(val)]
                     else: 
                         ret[key] = val
         return ret
