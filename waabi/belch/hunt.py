@@ -1,4 +1,5 @@
 import inspect
+import json
 
 
 class Hunt(object):
@@ -49,7 +50,7 @@ class Hunt(object):
             return None
         for key,val in params.items():
             vals = val if isinstance(val,list) else [val]
-            for v in vals: 
+            for v in vals:           
                 if body.find(v) > -1:
                     if key in ret.keys():
                         if isinstance(ret[key],list):
@@ -67,6 +68,7 @@ class Hunt(object):
             if int(log[1].length) > 0:
                 body = log[1].response.body 
                 body = body if not isinstance(body,bytes) else body.decode()
+                body = body if not isinstance(body,(list,dict,tuple)) else json.dumps(body)
                 qm = self._reflect_find(body,log[1].request.query)
                 bm = self._reflect_find(body,log[1].request.body) if isinstance(log[1].request.body,dict) else None 
             if qm or bm: 

