@@ -223,7 +223,7 @@ class Cli(Cmd):
         """
 
         if not self.ctlr.traversal_cmd(args):
-            self._invalid("sqli")
+            self._invalid("traversal")
     
     def do_permutate(self,args):
         """
@@ -304,6 +304,14 @@ class Cli(Cmd):
         if not self.ctlr.hunt_cmd(args):
             self._invalid("hunt")
 
+    def do_burp(self,args):
+        """
+        Replays a result through the burp proxy for further tampering
+        Usage burp [result id]
+        Examples: burp 123
+        """
+        if not self.ctlr.burp_cmd(args):
+            self._invalid("burp")
 
 
 

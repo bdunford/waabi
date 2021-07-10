@@ -23,6 +23,7 @@ class Request(object):
         self.cookies = Parser.CookiesFromHeader(self.header["Cookie"]) if "Cookie" in self.header.keys() else None
         self.query = None if len(url.split("?")) == 1 else urllib.parse.parse_qs(url.split("?")[1])
         self.body = Parser.BodyFromSplit(body,self.header)
+        self.content = body
 
     def HeaderNoCookies(self):
         d =  {}
@@ -42,7 +43,6 @@ class Response(object):
         self.header = Parser.HeaderFromSplit(header)
         self.cookies = Parser.CookiesFromHeader(self.header["Set-Cookie"]) if "Set-Cookie" in self.header.keys() else {}
         self.body = Parser.BodyFromSplit(body,self.header) 
-
 
 class Log(object):
 

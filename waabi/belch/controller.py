@@ -210,6 +210,23 @@ class Controller(object):
             self._error()
         return False
 
+    def burp_cmd(self,raw): 
+        try: 
+            args = Args(raw,[("result_id",int)],1)
+            if self._validate(args,"result_id"):
+                result = self.results.Get(args.result_id)
+                r = self.replay.Result(result,self.proxies)
+                self.display.Header("Result: {0} Sent Through Burp Proxy".format(result.result_id))
+                self.display.Pair(r.request.method.upper(),r.request.url)
+                self.display.BR()
+                return True
+        except:
+            self._error()
+        return False
+           
+
+
+
     def options_cmd(self, raw):
         self.display.Header("Belch Cil Options")
         self.display.Dict(self.options.List())

@@ -83,6 +83,25 @@ class Html(object):
         return val
 
     @staticmethod
+    def QueryToStr(query):
+        ret = []
+        if query:
+            if isinstance(query,str):
+                return query
+            for k,v in query.items():
+                if isinstance(v,list):
+                    for x in v:
+                        ret.append("{0}={1}".format(k,x))
+                else:
+                    ret.append("{0}={1}".format(k,v))
+            if len(ret) > 0:
+                return "&".join(ret)
+        
+        return None
+
+
+
+    @staticmethod
     def SmartEncode(query): 
         ret = []
         if query:

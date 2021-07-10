@@ -93,6 +93,19 @@ class Replay(object):
 
         return value            
 
+    def Result(self,result,proxies):
+            req = result.response.request
+            r = requests.request(
+                req.method.lower(),
+                req.url,
+                headers=req.headers,
+                data=req.body,
+                allow_redirects=False,
+                verify=False,
+                proxies=proxies
+            )        
+            return r
+
 
     def Repeat(self,i,log,label,parameters,values,pv_opts,meta_opts,on_success,on_fail):
         pvl = []
@@ -129,6 +142,11 @@ class Replay(object):
             if pv:
                 v = o
                 for parameter,value in pv.items():
+                    if parameter == "query":
+                        v["query"] = Html.QueryToStr(o["query"])
+                    if parameter == "body":
+                        v["body"] = x.request.content
+
                     pt = To.Array(parameter,".") 
                     for i in range(len(pt)): 
                         if pt[i] in v.keys():
@@ -146,12 +164,18 @@ class Replay(object):
                                 v[pt[i]] = self._prepare_value(v[pt[i]],value,find)
             o = self._method_change(o,log,flip)
             query = Html.SmartEncode(o["query"]) if self._opt("smart_encode") else o["query"]
-            ct = "default"
-            for k in o["headers"].keys():
-                if k.lower() == "content-type":
-                    ct = o["headers"][k]
-            json = o["body"] if ct.find("json") > -1 else None
-            body = None if json != None else o["body"]
+            
+            if isinstance(o["body"], str): 
+                body = o["body"]
+                json = None
+            else: 
+                ct = "default"
+                for k in o["headers"].keys():
+                    if k.lower() == "content-type":
+                        ct = o["headers"][k]
+                json = o["body"] if ct.find("json") > -1 else None
+                body = None if json != None else o["body"]
+
             r = requests.request(
                 o["method"].lower(),
                 o["url"] + o["path"],
