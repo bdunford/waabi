@@ -202,9 +202,13 @@ class Display(object):
                     self.Pair("Lines",", ".join(lines))
                 self.BR()
 
-    def JWT(self,record,jwts,canary):
-        self.Log(record)
-        self.Header("JWT(s):")
+    def JWT(self,record,jwts,canary,issuer,private_key_file,kid):
+        if record: 
+            self.Log(record)
+        else: 
+            jwts = [jwts]
+        self.BR()
+        self.P("JWT(s):")
         if jwts: 
             for jwt in jwts:
                 self.HR()
@@ -222,6 +226,8 @@ class Display(object):
                 self.P(jwt.AsAlgHS256())
                 self.Header("ENCODED: WITH CANARY")
                 self.P(jwt.WithCanaryIss(canary))
+                self.Header("ENCODED: WITH MOCK OAUTH")
+                self.P(jwt.WithMockOauth(issuer,private_key_file,kid))
                 if len(jwt.errors) > 0:
                     self.Header("ERRORS: TOKEN PARSING ERRORS")
                     self.P(jwt.errors)

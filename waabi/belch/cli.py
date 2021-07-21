@@ -99,14 +99,28 @@ class Cli(Cmd):
             self._invalid("header")
 
                
-    def do_jwt(self, args):
+    def do_jwts(self, args):
         """
         Attempt to find a Parse JWT's found on a record.
-        Usage: jwt [log number]
-        Examples: jwt 123
+        Usage: jwts [log number]
+        Examples: jwts 123
         """
+
+        if not self.ctlr.jwts_cmd(args):
+            self._invalid("jwts")
+
+    def do_jwt(self, args):
+        """
+        Parse the supplied JWT or lauch a wizzard to construct a JWT
+        Usage: jwt [token]
+        Usage: jwt
+        Examples: jwt eyJhbGciOi.eyJzdWIiOiIxMjM0NTY3OD.SflKx
+                  jwt
+        """
+
         if not self.ctlr.jwt_cmd(args):
             self._invalid("jwt")
+
 
            
     def do_reflected(self,args):
@@ -283,6 +297,16 @@ class Cli(Cmd):
         """
         if not self.ctlr.set_cmd(args):
             self._invalid("set")
+    
+    def do_save(self,args):
+        """
+        Save Belch CLI Setting
+        Usage save
+        Examples: save
+        """
+        if not self.ctlr.save_cmd(args):
+            self._invalid("save")
+ 
         
     def do_parameters(self,args):
         """

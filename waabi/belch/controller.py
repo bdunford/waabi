@@ -1,4 +1,5 @@
 import re
+import json
 import traceback
 from waabi.belch.options import Options
 from waabi.belch.logs import Logs
@@ -9,10 +10,12 @@ from waabi.belch.results import Results
 from waabi.belch.generator import Generate
 from waabi.belch.replay import Replay
 from waabi.belch.parser import Parser
+from waabi.belch.wizzard import Wizzard
 from waabi.utility.writer import Writer
 from waabi.utility.html import Html
 from waabi.utility.to import To
 from waabi.utility.wordlist import WordList
+from waabi.utility.jwty import Jwty
 
 class Controller(object):
 
@@ -228,7 +231,7 @@ class Controller(object):
 
 
     def options_cmd(self, raw):
-        self.display.Header("Belch Cil Options")
+        self.display.Header("Belch Cli Options")
         self.display.Dict(self.options.List())
         self.display.BR()
         return True
@@ -248,6 +251,13 @@ class Controller(object):
         except:
             self._error()
         return False
+
+    def save_cmd(self,raw):
+        self.display.Header("Saving Belch Cli Options")
+        self.options.Save()
+        self.display.Format("Options saved to: {0}",True,self.options._file)
+        self.display.BR()
+        return True
             
     def reload_cmd(self,raw):
         try:
@@ -282,7 +292,7 @@ class Controller(object):
             self._error()
         return False
 
-    def jwt_cmd(self, raw):
+    def jwts_cmd(self, raw):
         try:
             args = Args(raw,[("log_id",int)],1)
             if self._validate(args,"log_id"):
@@ -291,9 +301,62 @@ class Controller(object):
                 if log.response and log.response.raw:
                     x += log.response.raw
                 jwts = Parser.FindJWTs(x)
-                self.display.JWT((args.log_id,log),jwts,self.options.Get("canary_url"))
+                self.display.JWT(
+                    (args.log_id,log),
+                    jwts,
+                    self.options.Get("canary_url"),
+                    self.options.Get("oauth_issuer"),
+                    self.options.Get("oauth_keyfile"),
+                    self.options.Get("oauth_kid"),
+                )
                 return True
         except:
+            self._error()
+        return False
+
+    def jwt_cmd(self,raw):
+        try: 
+            args = Args(raw,[("token",str)],0)
+                    
+            canary = self.options.Get("canary_url")
+            issuer = self.options.Get("oauth_issuer")
+            keyfile = self.options.Get("oauth_keyfile")
+            kid = self.options.Get("oauth_kid")
+
+            if args.token: 
+                jwt = Jwty(args.token)
+                self.display.JWT(
+                    False,
+                    jwt,
+                    canary,
+                    issuer,
+                    keyfile,
+                    kid
+                )
+            else:
+                wzd = Wizzard({
+                    "header":("Enter Header (Default None):",dict,True,{}),
+                    "payload":("Enter Payload (Default None):",dict,True,{}),
+                    "secret":("Enter HS Secret or RS Key (Default None):",str,True,False),
+                    "signature":("Enter Signature (Default None): ",str,False,False)
+                })
+                self.display.Header("JWT Builder")
+                wzd.Launch()
+                j = Jwty.Construct(
+                    wzd.payload, 
+                    keyfile, 
+                    kid, 
+                    issuer, 
+                    wzd.header, 
+                    wzd.secret, 
+                    wzd.signature
+                )
+                self.display.Header("ENCODED TOKEN: ")
+                print(j)
+                self.display.BR()
+
+            return True
+        except: 
             self._error()
         return False
 

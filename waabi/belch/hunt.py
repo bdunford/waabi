@@ -1,6 +1,8 @@
+import re
 import inspect
 import json
-
+from waabi.utility.printer import Printer
+from waabi.utility.to import To
 
 class Hunt(object):
     
@@ -96,6 +98,64 @@ class Hunt(object):
                 ret += u
         return ret
 
+    
+    def for_inputs(self):
+        
+        #if you find one skip
+        patterns = {
+            "url": re.compile("(http|https)\:\/\/"),
+            "file": re.compile("\.(php|pdf|exe|txt|asp|aspx|json|do|pl|html|js|csv|htm|jsp|css|ashx|dhtml|cgi|cfm|action|rb|shtml|xml)"),
+            "code": re.compile("[\{\}\$\;\=\|\:]+"),
+            "path": re.compile("[\/\\\\]+")
+        }
+
+        ret = []
+        tpl = "{0} {1} {2}\n{3}\n"
+        
+        for log in self.logs.Search():
+            params = {}
+            if log[1].request.query: 
+                params["Query"] = To.SingleDemension(log[1].request.query)
+            if log[1].request.body:
+                sd = To.SingleDemension(log[1].request.body)
+                if sd: 
+                    params["Body"] = sd
+            finds = {}
+            for param,values in params.items(): 
+                for f,v in values.items(): 
+                    for t,p in patterns.items():
+                        if p.search(v.lower()):
+                            if param in finds.keys(): 
+                                finds[param][f] = (t,v)
+                            else: 
+                                finds[param] = {f:(t,v)}
+                            break
+            
+                   
+            if len(finds.keys()) > 0: 
+                meta = []
+                for p,find in finds.items():
+                    label = p + ":"
+                    for f,v in find.items():
+                        meta.append(Printer.Cols([
+                            (label,7,False),
+                            (f,25,False),
+                            (v[0].upper(),5,False),
+                            (v[1],80,False),
+                        ],False))
+                        label = ""
+                ret.append(
+                    tpl.format(
+                        log[0],
+                        log[1].method,
+                        log[1].request.uri,
+                        "\n".join(meta)
+                    )
+                )
+
+
+        return ret
+        
 
         
 

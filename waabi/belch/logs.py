@@ -49,7 +49,7 @@ class Logs(object):
     def Get(self,log_id):
         return self._logs[log_id - 1] if self.Exists(log_id) else False
 
-    def Search(self,terms,pairs):
+    def Search(self,terms=[],pairs={}):
         ret = []
         i = 0 
         for l in self._logs:

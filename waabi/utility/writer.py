@@ -22,7 +22,6 @@ class Writer(object):
 
     @staticmethod
     def Json(filepath, content):
-
         Writer.EnsureFilePath(filepath)
         j = json.dumps(content,indent=2)
         with open(filepath,'w') as w:
