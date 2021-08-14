@@ -218,6 +218,8 @@ class Display(object):
                 self.Json(jwt.payload)
                 self.Header("SIGNATURE: BASE64")
                 self.P(jwt.signature)
+                self.Header("PUBLIC KEY: PEM")
+                self.P(jwt.PublicKey())
                 self.Header("ENCODED: ORIGIONAL")
                 self.P(jwt.encoded)
                 self.Header("ENCODED: NONE ALGORITHM")
@@ -258,8 +260,6 @@ class Display(object):
             return x
         else:
             self.P(x)
-
-
 
 
     def GetPrompt(self):

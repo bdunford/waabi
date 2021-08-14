@@ -11,9 +11,10 @@ class Hunt(object):
         self.results = {}
         cats = {f[0].replace("for_",""):f[1] for f in inspect.getmembers(self,predicate=inspect.ismethod) if f[0].find("for_") > -1}
         if category in cats.keys(): 
-            self.results[category.capitalize()] = cats[category]() 
-        for k,v in cats.items():
-            self.results[k.capitalize()] = v()
+            self.results[category.capitalize()] = cats[category]()
+        else: 
+            for k,v in cats.items():
+                self.results[k.capitalize()] = v()
 
 
     #Add Path Matches

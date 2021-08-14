@@ -19,7 +19,17 @@ class Jwty(object):
     def Uenc(part):
         part = json.dumps(part) if part else '{}'
         return base64.urlsafe_b64encode(part.encode()).strip(b'=')
- 
+    @staticmethod
+    def SignAsHS(header,payload,secret,alg):
+        eh = Jwty.Uenc(header)
+        ep = Jwty.Uenc(payload)
+        sig = base64.urlsafe_b64encode(hmac.new(secret, eh + b'.' + ep, alg).digest().strip()).strip(b'=')   
+        return "{0}.{1}.{2}".format(
+            eh.decode(),
+            ep.decode(),
+            sig.decode()
+        )
+
     def __init__(self,t):
         parts = t.split(".")
         self.header = jwt.get_unverified_header(t)
@@ -42,8 +52,8 @@ class Jwty(object):
             except Exception as ex:
                 self.errors.append("Error getting public Key: {0}".format(str(ex)))
         return None
-
-   
+    
+       
     def AsAlgNone(self):
         header = {
             "alg": "none",
@@ -61,16 +71,8 @@ class Jwty(object):
                 "typ": "JWT"
             }
 
-            eh = Jwty.Uenc(header)
-            ep = Jwty.Uenc(self.payload)
-            sig = base64.urlsafe_b64encode(hmac.new(self.public_key, eh + b'.' + ep, hashlib.sha256).digest().strip()).strip(b'=')
-
+            return Jwty.SignAsHS(header,self.payload,self.public_key,hashlib.sha256)
            
-            return "{0}.{1}.{2}".format(
-                eh.decode(),
-                ep.decode(),
-                sig.decode()
-            )
 
         msg = "No RSA Public Key Found!\n"
         if len(self.errors) > 0:
@@ -112,6 +114,13 @@ class Jwty(object):
             return token
         except Exception as ex:
             return "Error encoding token: {0}".format(ex)
+    
+    def PublicKey(self): 
+        if self.public_key: 
+            return self.public_key.decode()
+        else: 
+            return "Error: Public Key not found"
+
 
     @staticmethod    
     def Construct(payload, keyfile, kid, issuer, header, secret, signature):
@@ -122,7 +131,10 @@ class Jwty(object):
             if not alg:
                 return "Error: Header containing an alg must be present when supplying secret."
             else: 
-                try: 
+                try:
+                    if alg in ("HS256","HS512"): 
+                        alg_enc = hashlib.sha512 if alg == "HS512" else hashlib.sha256
+                        return Jwty.SignAsHS(header,payload,secret.encode(),alg_enc)
                     header.pop("alg",None)
                     token = jwt.encode(
                         payload,
