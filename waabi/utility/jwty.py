@@ -42,7 +42,7 @@ class Jwty(object):
     def _get_public_key(self):
         if self.header["alg"][:2] == "RS":
             try:
-                wk_res = requests.get(self.payload["iss"] + "/.well-known/openid-configuration")
+                wk_res = requests.get(self.payload["iss"] + "/.well-known/openid-configuration",verify=False)
                 jwks_uri = wk_res.json()["jwks_uri"]
                 jwks_client = PyJWKClient(jwks_uri)
                 return jwks_client.get_signing_key_from_jwt(self.encoded).key.public_bytes(
