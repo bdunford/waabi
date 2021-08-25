@@ -81,8 +81,8 @@ class To(object):
                 return False
 
     @staticmethod
-    def SafeString(mixed): 
-        if isinstance(body,bytes):
+    def SafeDecode(mixed): 
+        if isinstance(mixed,bytes):
             return mixed.decode("utf-8", "ignore")
         else: 
             return mixed
