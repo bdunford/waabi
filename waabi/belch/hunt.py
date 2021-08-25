@@ -73,7 +73,7 @@ class Hunt(object):
         for log in self.logs.Search([],{"mime":"HTML"}):
             if int(log[1].length) > 0:
                 body = log[1].response.body 
-                body = body if not isinstance(body,bytes) else body.decode()
+                body = To.SafeString(body)
                 body = body if not isinstance(body,(list,dict,tuple)) else json.dumps(body)
                 qm = self._reflect_find(body,log[1].request.query)
                 bm = self._reflect_find(body,log[1].request.body) if isinstance(log[1].request.body,dict) else None 

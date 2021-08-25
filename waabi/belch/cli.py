@@ -320,9 +320,11 @@ class Cli(Cmd):
 
     def do_hunt(self,args):
         """
-        Search for interesting requests, responses, headers, cookies. All things that might be worth taking a deeper look at. 
-        Usage hunt [optional category - paths headers whatever]
-        sub commands "paths, headers, reflected, cookies,"
+        Search for interesting requests and responses. All things that might be worth taking a deeper look at. 
+        Usage hunt [optional category]
+        Categories: headers, reflected, inputs
+        Examples: hunt
+                  hunt reflected
         """
 
         if not self.ctlr.hunt_cmd(args):
