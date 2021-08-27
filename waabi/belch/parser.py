@@ -91,7 +91,7 @@ class Parser(object):
     def HeaderFromSplit(header_parts):
         header={}
         for r in header_parts:
-            parts = r.split(":")
+            parts = r.decode().split(":") if isinstance(r,bytes) else r.split(":")
             k = parts[0]
             v = ":".join(parts[1:])
             if k == "Set-Cookie":

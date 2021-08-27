@@ -17,7 +17,6 @@ class Hunt(object):
                 self.results[k.capitalize()] = v()
 
 
-    #Add Path Matches
     def _reflect_calc_score(self,params):
         score = 0
         if not params: 
@@ -34,8 +33,8 @@ class Hunt(object):
                 ret.append("{0}: {1}".format(k,v))
         return score,ret
         
-
-
+    
+   
     def _reflect_result(self,logId,method,url,qMatches,bMatches):
         qscore, q = self._reflect_calc_score(qMatches)
         bscore, b = self._reflect_calc_score(bMatches)
@@ -46,13 +45,12 @@ class Hunt(object):
         if b: 
             ret["value"] += "Post Params  --> {0}\n".format(" | ".join(b))
         return ret
-    
 
-    #TODO handle complex types through recusion
-    #     is isinstance list or dict
+       
+
     def _reflect_find(self,body,params):
         ret = {}
-        if not params: 
+        if not params or not body: 
             return None
         for key,val in params.items():
             vals = val if isinstance(val,list) else [val]
@@ -67,7 +65,65 @@ class Hunt(object):
                         ret[key] = str(val)
         return ret
     
-    #remove duplicates keep best score
+
+    def _ifind(self,haystack,needle): 
+        if haystack.lower().find(needle.lower()) > -1: 
+            return True
+        return False
+
+    def _injections_result(self,logid,method,url,headers,qm,bm):
+        
+        ret={"id":logid,"sig":method+url}
+        ret["value"] = "{0}  {1} {2}\n".format(logid,method,url)
+        
+        qm = qm if qm else {}
+        bm = bm if bm else {}
+        
+        for k in set(list(qm.keys()) + list(bm.keys())): 
+            ret["value"] += "{0}: {1}\n".format(k,headers[k])
+            if k in qm.keys(): 
+                ret["value"] += "  Query Params --> {0}\n".format(" | ".join(map(lambda x: "{0}={1}".format(x[0],x[1]),qm[k])))
+            if k in bm.keys(): 
+                ret["value"] += "  Post Params --> {0}\n".format(" | ".join(map(lambda x: "{0}={1}".format(x[0],x[1]),bm[k])))
+        return ret
+
+
+    def _injections_find(self,headers,params): 
+        l = 3
+        ret = {}
+        if not params: 
+            return None
+        for hk,hv in headers.items(): 
+            hv = " ".join(hv) if isinstance(hv,list) else hv
+            matches = []
+            for pn,pv in params.items(): 
+                found = False
+                pv = pv if isinstance(pv,list) else [pv]
+                for v in pv: 
+                    if len(pn) > l: 
+                        if self._ifind(hk,pn):
+                            found = True
+                        if self._ifind(hv,pn):
+                            found = True
+                    if len(v) > l: 
+                        if self._ifind(hk,v):
+                            found = True
+                        if self._ifind(hv,v):
+                            found = True
+                if found: 
+                    matches.append((pn," ".join(pv)))
+            if len(matches) > 0: 
+                ret[hk] = matches
+        if len(ret.keys()) > 0: 
+            return ret
+        return None
+        
+    def _header_find(self,header,headers): 
+        for k,v in headers.items(): 
+            if header.lower() == k.lower():
+                return "{0}: {1}".format(header,v)
+        return False
+
     def for_reflected(self):
         ret = []
         for log in self.logs.Search([],{"mime":"HTML"}):
@@ -93,16 +149,19 @@ class Hunt(object):
                    
     def for_headers(self): 
         ret = []
-        for n in ["Server","X-Powered-By","Content-Type","Transfer-Encoding","Access-Control-Allow-Origin"]:
-            u = self.logs.Unique("response",n + "\:.{1,50}",[],{})
-            if len(u) > 0:
-                ret += u
-        return ret
+        x = ["Server","X-Powered-By","Content-Type","Transfer-Encoding","Access-Control-Allow-Origin"]
 
+        for l in self.logs.Search(): 
+            for h in x: 
+                reqh = self._header_find(h,l[1].request.header)
+                if reqh and reqh not in ret:
+                    ret.append(reqh)
+                resh = self._header_find(h,l[1].response.header)
+                if resh and resh not in ret:
+                    ret.append(resh)
+        return list(sorted(ret))
     
     def for_inputs(self):
-        
-        #if you find one skip
         patterns = {
             "url": re.compile("(http|https)\:\/\/"),
             "file": re.compile("\.(php|pdf|exe|txt|asp|aspx|json|do|pl|html|js|csv|htm|jsp|css|ashx|dhtml|cgi|cfm|action|rb|shtml|xml)"),
@@ -157,6 +216,21 @@ class Hunt(object):
 
         return ret
         
+    def for_injections(self): 
+        ret = []
+        for log in self.logs.Search():
+            #filter
+            headers = log[1].response.header
+            qm = self._injections_find(headers,log[1].request.query)
+            bm = self._injections_find(headers,log[1].request.body) if isinstance(log[1].request.body,dict) else None 
+            if qm or bm: 
+                url = "{0}://{1}{2}".format(log[1].protocol,log[1].host,log[1].path)
+                ret.append(self._injections_result(log[0],log[1].method,url,headers,qm,bm))
+        final = []
+        for r in sorted(ret, key = lambda i: -i["id"]):
+            if r["sig"] not in map(lambda m: m["sig"],final):
+                final.append(r)
+        return map(lambda m: m["value"],final)
 
-        
+
 

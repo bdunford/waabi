@@ -130,6 +130,7 @@ class Cli(Cmd):
         Examples: reflected 123 query.id w1ndsor
                   reflected 123 path w1ndsor 
                   reflected 123 body.name w1ndsor
+                  reflected 123 #
         """    
         if not self.ctlr.reflected_cmd(args):
             self._invalid("reflected")

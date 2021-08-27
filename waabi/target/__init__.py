@@ -78,7 +78,129 @@ class Target(Base):
             "proxy":{
                 "http_history_display_filter":{
                     "by_request_type": {"show_only_in_scope_items":True}
-                }
+                },
+                "match_replace_rules":[
+                    {
+                        "comment":"Add QWERTY Query String Exists",
+                        "enabled":True,
+                        "is_simple_match":False,
+                        "rule_type":"request_first_line",
+                        "string_match":"^(\\w+\\s[^\\s]+\\?[^\\s]+)(\\sHTTP.+)$",
+                        "string_replace":"$1&qwerty=ytrewq$2"
+                    },
+                    {
+                        "comment":"Add QWERTY No Query String",
+                        "enabled":True,
+                        "is_simple_match":False,
+                        "rule_type":"request_first_line",
+                        "string_match":"^(\\w+\\s[^\\?]+)(\\sHTTP.+)$",
+                        "string_replace":"$1?qwerty=ytrewq$2"
+                    },
+                    {
+                        "comment":"Add QWERTY Query (?) exists with no query",
+                        "enabled":True,
+                        "is_simple_match":False,
+                        "rule_type":"request_first_line",
+                        "string_match":"^(\\w+\\s[^\\s]+\\?)(\\sHTTP.+)$",
+                        "string_replace":"$1qwerty=ytrewq$2"
+                    },
+                    {
+                        "comment":"Add QWERTY Remove Doubled query",
+                        "enabled":True,
+                        "is_simple_match":False,
+                        "rule_type":"request_first_line",
+                        "string_match":"^(\\w+\\s[^\\s]+\\?[^\\s]*)qwerty\\=ytrewq\\&qwerty\\=ytrewq([^\\s]*\\sHTTP.+)$",
+                        "string_replace":"$1qwerty=ytrewq$2"
+                    },
+                    {
+                        "comment":"Emulate IE",
+                        "enabled":False,
+                        "is_simple_match":False,
+                        "rule_type":"request_header",
+                        "string_match":"^User-Agent.*$",
+                        "string_replace":"User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)"
+                    },
+                    {
+                        "comment":"Emulate iOS",
+                        "enabled":False,
+                        "is_simple_match":False,
+                        "rule_type":"request_header",
+                        "string_match":"^User-Agent.*$",
+                        "string_replace":"User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B176 Safari/7534.48.3"
+                    },
+                    {
+                        "comment":"Emulate Android",
+                        "enabled":False,
+                        "is_simple_match":False,
+                        "rule_type":"request_header",
+                        "string_match":"^User-Agent.*$",
+                        "string_replace":"User-Agent: Mozilla/5.0 (Linux; U; Android 2.2; en-us; Droid Build/FRG22D) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
+                    },
+                    {
+                        "comment":"Require non-cached response",
+                        "enabled":False,
+                        "is_simple_match":False,
+                        "rule_type":"request_header",
+                        "string_match":"^If-Modified-Since.*$"
+                    },
+                    {
+                        "comment":"Require non-cached response",
+                        "enabled":False,
+                        "is_simple_match":False,
+                        "rule_type":"request_header",
+                        "string_match":"^If-None-Match.*$"
+                    },
+                    {
+                        "comment":"Hide Referer header",
+                        "enabled":False,
+                        "is_simple_match":False,
+                        "rule_type":"request_header",
+                        "string_match":"^Referer.*$"
+                    },
+                    {
+                        "comment":"Require non-compressed responses",
+                        "enabled":False,
+                        "is_simple_match":False,
+                        "rule_type":"request_header",
+                        "string_match":"^Accept-Encoding.*$"
+                    },
+                    {
+                        "comment":"Ignore cookies",
+                        "enabled":False,
+                        "is_simple_match":False,
+                        "rule_type":"response_header",
+                        "string_match":"^Set-Cookie.*$"
+                    },
+                    {
+                        "comment":"Rewrite Host header",
+                        "enabled":False,
+                        "is_simple_match":False,
+                        "rule_type":"request_header",
+                        "string_match":"^Host: foo.example.org$",
+                        "string_replace":"Host: bar.example.org"
+                    },
+                    {
+                        "comment":"Add spoofed CORS origin",
+                        "enabled":False,
+                        "is_simple_match":True,
+                        "rule_type":"request_header",
+                        "string_replace":"Origin: foo.example.org"
+                    },
+                    {
+                        "comment":"Remove HSTS headers",
+                        "enabled":False,
+                        "is_simple_match":False,
+                        "rule_type":"response_header",
+                        "string_match":"^Strict\\-Transport\\-Security.*$"
+                    },
+                    {
+                        "comment":"Disable browser XSS protection",
+                        "enabled":False,
+                        "is_simple_match":True,
+                        "rule_type":"response_header",
+                        "string_replace":"X-XSS-Protection: 0"
+                    }
+                ]
             },
             "target":{
                 "scope":{"exclude":[],"include":[]},
