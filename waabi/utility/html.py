@@ -1,10 +1,15 @@
 from requests_html import HTML
 import re
 import difflib
+from urllib.parse import unquote
 
 
 class Html(object):
 
+    
+    @staticmethod
+    def UrlDecode(value): 
+        return unquote(value)
 
     @staticmethod
     def FindExecJs(res,code,attributes,tryRender=True):

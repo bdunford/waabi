@@ -3,6 +3,7 @@ import inspect
 import json
 from waabi.utility.printer import Printer
 from waabi.utility.to import To
+from waabi.utility.html import Html
 
 class Hunt(object):
     
@@ -65,6 +66,29 @@ class Hunt(object):
                         ret[key] = str(val)
         return ret
     
+    def for_reflected(self):
+        ret = []
+        for log in self.logs.Search([],{"mime":"HTML"}):
+            if int(log[1].length) > 0:
+                body = log[1].response.body 
+                body = To.SafeDecode(body)
+                body = body if not isinstance(body,(list,dict,tuple)) else json.dumps(body)
+                qm = self._reflect_find(body,log[1].request.query)
+                bm = self._reflect_find(body,log[1].request.body) if isinstance(log[1].request.body,dict) else None 
+            if qm or bm: 
+                url = "{0}://{1}{2}".format(log[1].protocol,log[1].host,log[1].path)
+                ret.append(self._reflect_result(log[0],log[1].method,url,qm,bm))
+        final = []
+        for r in sorted(ret, key = lambda i: -i["score"]):
+            if r["sig"] not in map(lambda m: m["sig"],final):
+                final.append(r)
+            else: 
+                for i in range(len(final)):
+                    if r["sig"] == final[i]["sig"] and r["score"] > final[i]["score"]:
+                        final[i] = r
+        return map(lambda m: m["value"],final)
+
+
 
     def _ifind(self,haystack,needle): 
         if haystack.lower().find(needle.lower()) > -1: 
@@ -87,7 +111,7 @@ class Hunt(object):
                 ret["value"] += "  Post Params --> {0}\n".format(" | ".join(map(lambda x: "{0}={1}".format(x[0],x[1]),bm[k])))
         return ret
 
-
+   
     def _injections_find(self,headers,params): 
         l = 3
         ret = {}
@@ -117,39 +141,35 @@ class Hunt(object):
         if len(ret.keys()) > 0: 
             return ret
         return None
-        
+
+    def for_injections(self): 
+        ret = []
+        for log in self.logs.Search():
+            #filter
+            headers = log[1].response.header
+            qm = self._injections_find(headers,log[1].request.query)
+            bm = self._injections_find(headers,log[1].request.body) if isinstance(log[1].request.body,dict) else None 
+            if qm or bm: 
+                url = "{0}://{1}{2}".format(log[1].protocol,log[1].host,log[1].path)
+                ret.append(self._injections_result(log[0],log[1].method,url,headers,qm,bm))
+        final = []
+        for r in sorted(ret, key = lambda i: -i["id"]):
+            if r["sig"] not in map(lambda m: m["sig"],final):
+                final.append(r)
+        return map(lambda m: m["value"],final)
+    
+
     def _header_find(self,header,headers): 
         for k,v in headers.items(): 
             if header.lower() == k.lower():
                 return "{0}: {1}".format(header,v)
         return False
+    
 
-    def for_reflected(self):
-        ret = []
-        for log in self.logs.Search([],{"mime":"HTML"}):
-            if int(log[1].length) > 0:
-                body = log[1].response.body 
-                body = To.SafeDecode(body)
-                body = body if not isinstance(body,(list,dict,tuple)) else json.dumps(body)
-                qm = self._reflect_find(body,log[1].request.query)
-                bm = self._reflect_find(body,log[1].request.body) if isinstance(log[1].request.body,dict) else None 
-            if qm or bm: 
-                url = "{0}://{1}{2}".format(log[1].protocol,log[1].host,log[1].path)
-                ret.append(self._reflect_result(log[0],log[1].method,url,qm,bm))
-        final = []
-        for r in sorted(ret, key = lambda i: -i["score"]):
-            if r["sig"] not in map(lambda m: m["sig"],final):
-                final.append(r)
-            else: 
-                for i in range(len(final)):
-                    if r["sig"] == final[i]["sig"] and r["score"] > final[i]["score"]:
-                        final[i] = r
-        return map(lambda m: m["value"],final)
-
-                   
+                      
     def for_headers(self): 
         ret = []
-        x = ["Server","X-Powered-By","Content-Type","Transfer-Encoding","Access-Control-Allow-Origin"]
+        x = ["Server","X-Powered-By","Content-Type","Transfer-Encoding","Access-Control-Allow-Origin","Access-Control-Allow-Credentials"]
 
         for l in self.logs.Search(): 
             for h in x: 
@@ -216,21 +236,62 @@ class Hunt(object):
 
         return ret
         
-    def for_injections(self): 
+       
+    def _cookie_results(self,cookies): 
         ret = []
-        for log in self.logs.Search():
-            #filter
-            headers = log[1].response.header
-            qm = self._injections_find(headers,log[1].request.query)
-            bm = self._injections_find(headers,log[1].request.body) if isinstance(log[1].request.body,dict) else None 
-            if qm or bm: 
-                url = "{0}://{1}{2}".format(log[1].protocol,log[1].host,log[1].path)
-                ret.append(self._injections_result(log[0],log[1].method,url,headers,qm,bm))
-        final = []
-        for r in sorted(ret, key = lambda i: -i["id"]):
-            if r["sig"] not in map(lambda m: m["sig"],final):
-                final.append(r)
-        return map(lambda m: m["value"],final)
+        for k,v in cookies.items(): 
+            dom = v["Domain"] if "Domain" in v.keys() else "No Domain Set"
+            enc = self._cookie_encoding(v["value"])
+            sms = v["SameSite"] if "SameSite" in v.keys() else "Lax"
+            htp = "HttpOnly" if "HttpOnly" in v.keys() else ""
+            sec = "Secure" if "Secure" in v.keys() else ""
+            ret.append(
+                Printer.Cols([
+                    (dom,40,False),
+                    (k,40,False),
+                    (enc,7,False),
+                    (sms,9,False),
+                    (htp,9,False),
+                    (sec,7,False),
+                ],False)
+            )
+
+        return ret
+
+    def _cookie_encoding(self,value):
+        if re.match("^[0-9]+$",value):
+            return "NUMBER"
+        if re.match("^[0-9A-Fa-f]+$",value): 
+            return "HEXDEC"
+        if re.match("^[0-9A-Fa-f\-]{36}$",value):
+            return "GUID"
+        if re.findall("[A-Za-z0-9\+\/]{10,}\=*\.[A-Za-z0-9\+\/]{25,}\=*\.[A-Za-z0-9\+\/\=\_\-]*",value):
+            return "JWT"
+        if re.match("^[a-zA-Z]+$",value): 
+            return "CHARS"
+        if re.match("([A-Za-z0-9\+\/]+\=*){4,}",value): 
+            return "BASE64"
+        if re.findall("[\{\[]+.*[\}\]]+",Html.UrlDecode(value)): 
+            return "OBJECT"
+        return "UNKNOWN"
+
+    def for_cookies(self): 
+        ret = []
+        for log in self.logs.Search(): 
+            res = log[1].response
+            if res.cookies:
+                ret += self._cookie_results(res.cookies)
+        h = Printer.Cols([
+            ("DOMAIN",40,False),
+            ("NAME",40,False),
+            ("VALUE",7,False),
+            ("SAMESITE",9,False),
+            ("HTTPONLY",9,False),
+            ("SECURE",7,False),
+        ],False)
+
+        return [h] + list(sorted(set(ret)))
+
 
 
 
