@@ -129,7 +129,7 @@ class Hunt(object):
                             found = True
                         if self._ifind(hv,pn):
                             found = True
-                    if len(v) > l: 
+                    if v and len(v) > l: 
                         if self._ifind(hk,v):
                             found = True
                         if self._ifind(hv,v):
