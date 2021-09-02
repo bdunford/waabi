@@ -60,22 +60,24 @@ class To(object):
 
     @staticmethod
     def SingleDemension(mixed,key=None):
+        if key != None and len(key) == 0: 
+            key = "_BLANK_"
         ret = {}
         if isinstance(mixed,(list, dict, tuple)): 
             if isinstance(mixed,dict): 
                 for k,v in mixed.items():
-                    ret.update(To.SingleDemension(v,"{0}.{1}".format(key,k) if key else str(k)))
+                    ret.update(To.SingleDemension(v,"{0}.{1}".format(key,k) if key != None else str(k)))
                 return ret
             else:
                 if len(mixed) == 1: 
                     return To.SingleDemension(mixed[0],key)
                 i = 0 
                 for m in mixed:
-                    ret.update(To.SingleDemension(m,"{0}[{1}]".format(key,i) if key else "[{0}]".format(i)))
+                    ret.update(To.SingleDemension(m,"{0}[{1}]".format(key,i) if key != None else "[{0}]".format(i)))
                     i += 1
                 return ret 
         else: 
-            if key: 
+            if key != None: 
                 return {key:str(mixed)}
             else: 
                 return False

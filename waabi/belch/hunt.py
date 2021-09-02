@@ -183,18 +183,9 @@ class Hunt(object):
         for log in self.logs.Search():
             params = {}
             if log[1].request.query:
-                try: 
-                    params["Query"] = To.SingleDemension(log[1].request.query)
-                except: 
-                    print(json.dumps(log[1].request.query,indent=2))
-                    raise Exception("Broken Query")
+                params["Query"] = To.SingleDemension(log[1].request.query)
             if log[1].request.body:
-                try:
-                    sd = To.SingleDemension(log[1].request.body)
-                except: 
-                    print(json.dumps(log[1].request.body,indent=2))
-                    raise Exception("Broken Body")
-
+                sd = To.SingleDemension(log[1].request.body)
                 if sd: 
                     params["Body"] = sd
             finds = {}
