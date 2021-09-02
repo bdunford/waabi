@@ -106,9 +106,9 @@ class Hunt(object):
         for k in set(list(qm.keys()) + list(bm.keys())): 
             ret["value"] += "{0}: {1}\n".format(k,headers[k])
             if k in qm.keys(): 
-                ret["value"] += "  Query Params --> {0}\n".format(" | ".join(map(lambda x: "{0}={1}".format(x[0],x[1]),qm[k])))
+                ret["value"] += "  Query Params --> {0}\n".format(" | ".join(qm[k]))
             if k in bm.keys(): 
-                ret["value"] += "  Post Params --> {0}\n".format(" | ".join(map(lambda x: "{0}={1}".format(x[0],x[1]),bm[k])))
+                ret["value"] += "  Post Params --> {0}\n".format(" | ".join(bm[k]))
         return ret
 
    
@@ -120,22 +120,10 @@ class Hunt(object):
         for hk,hv in headers.items(): 
             hv = " ".join(hv) if isinstance(hv,list) else hv
             matches = []
-            for pn,pv in params.items(): 
-                found = False
-                pv = pv if isinstance(pv,list) else [pv]
-                for v in pv: 
-                    if len(pn) > l: 
-                        if self._ifind(hk,pn):
-                            found = True
-                        if self._ifind(hv,pn):
-                            found = True
-                    if v and len(v) > l: 
-                        if self._ifind(hk,v):
-                            found = True
-                        if self._ifind(hv,v):
-                            found = True
-                if found: 
-                    matches.append((pn," ".join(pv)))
+            for v in To.SimpleStrArray(params):
+                if len(v) > l:
+                    if self._ifind(hk,v) or self._ifind(hv,v):
+                        matches.append(v)            
             if len(matches) > 0: 
                 ret[hk] = matches
         if len(ret.keys()) > 0: 
@@ -148,7 +136,7 @@ class Hunt(object):
             #filter
             headers = log[1].response.header
             qm = self._injections_find(headers,log[1].request.query)
-            bm = self._injections_find(headers,log[1].request.body) if isinstance(log[1].request.body,dict) else None 
+            bm = self._injections_find(headers,log[1].request.body)
             if qm or bm: 
                 url = "{0}://{1}{2}".format(log[1].protocol,log[1].host,log[1].path)
                 ret.append(self._injections_result(log[0],log[1].method,url,headers,qm,bm))

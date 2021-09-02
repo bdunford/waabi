@@ -81,6 +81,25 @@ class To(object):
                 return False
 
     @staticmethod
+    def SimpleStrArray(mixed): 
+        if isinstance(mixed,(list, dict, tuple)):
+            ret = []
+            if isinstance(mixed,dict):
+                for k,v in mixed.items(): 
+                    ret.append(str(k))
+                    ret += To.SimpleStrArray(v)
+            else: 
+                for v in mixed: 
+                    ret += To.SimpleStrArray(v)
+            return ret
+        else: 
+            return [str(mixed)]
+        
+
+        
+
+
+    @staticmethod
     def SafeDecode(mixed): 
         if isinstance(mixed,bytes):
             return mixed.decode("utf-8", "ignore")
