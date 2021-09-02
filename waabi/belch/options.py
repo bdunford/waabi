@@ -7,6 +7,7 @@ class Options(object):
     def __init__(self):
         self._file = os.path.expanduser("~/.waabi/options.json")
         self._options = {}
+        self.Set("width",120)
         self.Set("render",False)
         self.Set("encode_path",True)
         self.Set("smart_encode",True)
@@ -16,6 +17,7 @@ class Options(object):
         self.Set("oauth_issuer","https://your-oauth2-issuer.com/")
         self.Set("oauth_keyfile","/path/to/your/private.pem")
         self.Set("oauth_kid","kid-from-your-oauth2-server")
+        self.Set("highlight",["qwertry","ytrewq"])
         self.load()
     
     def load(self):

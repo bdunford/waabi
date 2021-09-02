@@ -1,12 +1,16 @@
 import json
+import re
 from waabi.utility.printer import Printer
 from waabi.utility.html import Html
 
 class Display(object):
     
-    def __init__(self,width=120):
-        self.width = width
+    def __init__(self,options):
+        self._options = options
         pass
+
+    def _opt(self,key): 
+        return self._options.Get(key)
     
     def _displayOptions(self,opt1,opt2,opt3):
         opts = [x for x in [opt1,opt2,opt3] if x is not False and x is not None]
@@ -24,6 +28,13 @@ class Display(object):
         return highlight,int(skip),int(take)
    
     def P(self,content,sep=False):
+        if self._opt("highlight"):
+            hl = self._opt("highlight")
+            hl = hl if isinstance(hl,list) else [hl]
+            for h in hl: 
+                if content.find(h) > -1: 
+                    if not re.findall("33\/.*{0}.*33\/".format(h),content): 
+                        content = content.replace(h,Printer.Highlighter(h,"yellow"))
         print("{0}{1}{0}".format("\n" if sep else "",content))
        
     
@@ -32,7 +43,7 @@ class Display(object):
         self.P(tpl.format(*vals))
 
     def HR(self):
-        self.P("-" * 120)
+        self.P("-" * self._opt("width"))
 
     def Pair(self,title,value,col=True,sep=False):
         self.P("{0}{1}{2} {3}{0}".format("\n" if sep else "",title,":" if col else "",value))

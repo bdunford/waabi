@@ -22,7 +22,7 @@ class Controller(object):
     def __init__(self,source):
         self.logs = Logs(source)
         self.options = Options() 
-        self.display = Display()
+        self.display = Display(self.options)
         self.results = Results()
         self.replay = Replay(self.options)
         self.proxies = {
@@ -243,7 +243,8 @@ class Controller(object):
                 value = int(args.value) if args.value.isdigit() else args.value
                 value = True if str(args.value).lower() == "true" else args.value
                 value = False if str(args.value).lower() == "false" else args.value
-                self.options.Set(args.key,value)     
+                value = args.value.split(",") if args.value.find(",") > -1 else args.value
+                self.options.Set(args.key,value)
                 self.display.Header("Belch Cli Options Updated")
                 self.display.Pair(args.key,value)
                 self.display.BR()
