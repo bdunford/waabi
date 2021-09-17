@@ -129,7 +129,7 @@ class Display(object):
                     body = result.meta["rendered"]
                 if result.meta and "diff" in result.meta.keys():
                     body = "".join(result.meta["diff"])
-                matches,lines = Printer.PrintBody(body,highlight,skip,take)
+                matches,lines = Printer.PrintBody(body,highlight,skip,take,self.P)
                 if highlight:
                     self.BR()
                     self.Pair("Highlights",matches)
@@ -198,15 +198,15 @@ class Display(object):
                 self.P("Cookie:")
                 self.Dict(x.request.cookies,"    ")
             self.BR(2)
-            if x.request.body: 
-                self.P(x.request.body) 
+            if x.request.body:
+                self.P(x.request.content) 
             self.HR()
 
             self.P(x.response.line) 
             self.Dict(x.response.header)
             self.BR(2)
             if full: 
-                matches,lines = Printer.PrintBody(x.response.body,highlight,skip,take)
+                matches,lines = Printer.PrintBody(x.response.body,highlight,skip,take,self.P)
                 if highlight:
                     self.BR()
                     self.Pair("Highlights",matches)

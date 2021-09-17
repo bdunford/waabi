@@ -203,7 +203,7 @@ class Parser(object):
     @staticmethod
     def FindJWTs(raw): 
         ret = []    
-        ptrn = "[A-Za-z0-9\+\/]{10,}\=*\.[A-Za-z0-9\+\/]{25,}\=*\.[A-Za-z0-9\+\/\=\_\-]*"  
+        ptrn = "[A-Za-z0-9\+\/\-\_]{10,}\=*\.[A-Za-z0-9\+\/\-\_]{25,}\=*\.[A-Za-z0-9\+\/\=\_\-]*"  
         if isinstance(raw,bytes):
             ptrn = ptrn.encode()
 

@@ -113,7 +113,11 @@ class Printer(object):
             return mc,list(map(lambda x: str(x),lines)),val
 
     @staticmethod
-    def PrintBody(content,highlight=False,skip=0,take=0):
+    def PrintBody(content,highlight=False,skip=0,take=0,printer=print):
+        if not content:
+            printer("")
+            return False,False
+
         if isinstance(content,(dict,list)):
             content = json.dumps(content,indent=2)
         content = content.replace("\r\n","\n")
@@ -133,7 +137,7 @@ class Printer(object):
         skip = 0 if skip <= 0 else abs(int(skip))
         skip = skip -1 if skip > 0 else skip
         results = "\n".join(map(lambda x: "\033[0;90m{0}\033[m {1}".format(str(x[0]).rjust(len(str(i))),x[1]),lined[skip:skip+take]))
-        print(results)
+        printer(results)
         return hc,lines
         
         
