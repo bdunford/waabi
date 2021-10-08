@@ -3,6 +3,7 @@ import json
 import requests
 import traceback
 from waabi.utility import Html, To
+import time
 
 
 class Replay(object):
@@ -128,6 +129,7 @@ class Replay(object):
 
     
     def Request(self,log,pv=None,find=False,flip=False,proxies=None):
+        time.sleep(int(self._opt("delay")) * 0.001)
         try: 
             x = copy.deepcopy(log)
             o = {
