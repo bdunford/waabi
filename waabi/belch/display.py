@@ -28,6 +28,8 @@ class Display(object):
         return highlight,int(skip),int(take)
    
     def P(self,content,sep=False):
+        if isinstance(content,bytes): 
+            content = content.decode()
         if self._opt("highlight"):
             hl = self._opt("highlight")
             hl = hl if isinstance(hl,list) else [hl]
