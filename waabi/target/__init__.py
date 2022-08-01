@@ -67,13 +67,11 @@ class Target(Base):
         waabi.belch.Cli().Start(self.burp,None)
 
     def _accept_scope(self):
-        parsed  = self._parse_lines(
+        scope  = self._parse_scope(
             "http[s]*\:\/\/[^\s\*]+",
             self._multi_line_input("Enter Target Scope:"),
         )
         
-        working = []
-        consolidated = [] 
         project = {
             "proxy":{
                 "http_history_display_filter":{
@@ -203,44 +201,22 @@ class Target(Base):
                 ]
             },
             "target":{
-                "scope":{"exclude":[],"include":[]},
+                "scope":scope,
                 "filter":{"by_request_type":{"show_only_in_scope_items":True}}
             }
         }
-        scope = []
 
-        for r in parsed: 
-            u = urlparse(r)
-            pp = u.path.split("/")
+
+        urls = []
+        for x in scope["include"]: 
             
-            if pp[-1].find(".") > -1: 
-                pp[-1] = ""
-            working.append("https://{0}{1}".format(u.netloc,"/".join(pp)).rstrip("/"))
-
-
-        for w in sorted(set(working),key=len):
-            found = False
-            for c in consolidated: 
-                if w.find(c) == 0: 
-                    found = True
-            if not found:
-                consolidated.append(w)
-        
-        for x in consolidated: 
-            u = urlparse(x)
-            scope.append("https://{0}{1}".format(u.netloc,u.path))
-            scope.append("http://{0}{1}".format(u.netloc,u.path))
-            project["target"]["scope"]["include"].append(
-                {
-                    "enabled":"true",
-                    "protocol":"any",
-                    "host":u.netloc,
-                    "file":u.path
-                }
-            )
-        Writer.Replace(self.scope,"\n".join(scope))
+            tpl = "{0}://{1}{2}"
+            if x["host"].find(":443") + x["host"].find(":443") != -2:
+                prot = x["prot"].lower() if x["prot"] != "any" else "https"
+                urls.append()
+            
         Writer.Json(self.project,project)
-        Writer.Replace(self.orig,"\n".join(parsed))
+        Writer.Replace(self.scope,"\n".join(urls))
         
 
 
@@ -257,14 +233,38 @@ class Target(Base):
             else: 
                 lines.append(line)
             
-    def _parse_lines(self,ptrn,lines):
-        ret = []
+    def _parse_scope(self,ptrn,lines):
+
+        try: 
+            target = json.loads("\n".join(lines))
+            if "scope" in target.keys(): 
+                return target["scope"]
+        except: 
+            pass
+            
+        parsed = []
         for l in lines:
             m = re.findall("http[s]*\:\/\/[^\s\*]+",l) 
             if len(m) > 0:
-                ret.append(m[0])
-        return list(sorted(set(ret)))
+                parsed.append(m[0])
+
+        scope = {"exclude":[],"include":[]}
+
+        for x in list(set(parsed)): 
+            u = urlparse(x)
+            scope["include"].append(
+                {
+                    "enabled":"true",
+                    "protocol":"any",
+                    "host":u.netloc,
+                    "file":u.path
+                }
+            )
+        return scope
+
        
+
+
         
 
 
