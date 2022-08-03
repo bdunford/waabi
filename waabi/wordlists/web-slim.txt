@@ -1,4 +1,51 @@
-#Web stuff
+#README
+readme.html
+readme.txt
+readme
+README.md
+
+
+#Licenses
+
+
+#HTTP Standard
+robots.txt
+sitemap.xml
+index.php
+index.html
+index.htm
+index.jsp
+index.asp
+index.aspx
+default.asp
+default.aspx
+default.php
+.well-known
+.htaccess
+.htpasswd
+.meta
+.web
+access_log
+error_log
+htdocs
+httpd
+php.ini
+error.php
+error.aspx
+error.jsp
+error
+conf/nginx.conf
+conf
+docs
+README
+LICENSE
+CHANGES
+.gitignore
+.gitignore.swp
+.git_release
+.gitattributes
+.gitconfig
+examples
 
 
 #OS files
@@ -12,6 +59,15 @@ docker-compose.yaml
 
 
 #Certificates
+id_rsa
+id_rsa.key
+id_rsa.priv
+id_rsa.pub
+private
+private.key
+certificate.pem
+certificate.cer
+
 
 
 
@@ -19,8 +75,30 @@ docker-compose.yaml
 
 
 #SourceControll
+GitVersion.xml
+
+
 
 
 #CommonDirectories
 
 
+
+#backups
+
+
+
+
+#iis
+
+
+#MISC 
+api/graphql
+v1/api/graphql
+explorer
+wordpress 
+cgi-bin
+
+
+#Logins
+https://github.com/danielmiessler/SecLists/blob/master/Discovery/Web-Content/Logins.fuzz.txt

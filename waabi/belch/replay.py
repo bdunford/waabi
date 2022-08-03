@@ -84,14 +84,16 @@ class Replay(object):
         return find,template
 
     def _prepare_value(self,source,value,find):
-        if isinstance(source,list):
-            if len(source) == 1: 
-                value = value.replace("{base}",source[0])
-                value = source[0].replace(find,value) if find else value
-        else: 
-            value = value.replace("{base}",source)
-            value = source.replace(find,value) if find else value
-
+        try: 
+            if isinstance(source,list):
+                if len(source) == 1: 
+                    value = value.replace("{base}",source[0])
+                    value = source[0].replace(find,value) if find else value
+            else:
+                value = value.replace("{base}",source)
+                value = source.replace(find,value) if find else value
+        except: 
+            pass 
         return value            
 
     def Result(self,result,proxies):

@@ -1,8 +1,8 @@
-
 import os
 import re
 import sys
 import time
+import json
 import waabi
 from urllib.parse import urlparse
 from waabi.core import Base
@@ -211,18 +211,13 @@ class Target(Base):
         for x in scope["include"]: 
             
             tpl = "{0}://{1}{2}"
-            if x["host"].find(":443") + x["host"].find(":443") != -2:
-                prot = x["prot"].lower() if x["prot"] != "any" else "https"
-                urls.append()
+            if x["host"].find(":443") + x["host"].find(":80") == -2:
+                prot = x["prot"].lower() if x["protocol"] != "any" else "https"
+                urls.append(tpl.format(prot,x["host"],x["path"] if "path" in x.keys() else "/"))
             
         Writer.Json(self.project,project)
         Writer.Replace(self.scope,"\n".join(urls))
         
-
-
-        
-
-
     def _multi_line_input(self,prompt):
         print(prompt)
         lines = []
@@ -235,11 +230,11 @@ class Target(Base):
             
     def _parse_scope(self,ptrn,lines):
 
-        try: 
+        try:
             target = json.loads("\n".join(lines))
-            if "scope" in target.keys(): 
-                return target["scope"]
-        except: 
+            if "scope" in target["target"].keys(): 
+                return target["target"]["scope"]
+        except Exception as e: 
             pass
             
         parsed = []
