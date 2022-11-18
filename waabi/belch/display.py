@@ -97,6 +97,8 @@ class Display(object):
         res = result.response
         req = result.response.request
         meta = result.meta
+        value = result.value.replace("\n","\\n") if result.value else ""
+
 
         if not detail:
             Printer.Cols([
@@ -110,7 +112,7 @@ class Display(object):
                 (result.meta["count"] if result.meta else "",4,False),
                 (result.type,7,False),
                 (result.parameter,25,False),
-                (result.value,35,False)  
+                (value,35,False)  
             ])
         else:
            
@@ -142,7 +144,7 @@ class Display(object):
             if result.pv:
                 for p,v in result.pv.items():
                     self.Pair("Parameter",p)
-                    self.Pair("Word",v)
+                    self.Pair("Word",v.replace("\n","\\n"))
                     self.BR()
             if meta:
                 if meta["type"] == "match":

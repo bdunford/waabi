@@ -475,6 +475,17 @@ class Controller(object):
                 self._substitute(args.opt2)
             ]
 
+            section = None
+            value = self.options.Get("nasty")
+
+            for o in opts:
+                if o:
+                    if o in ["headers","cookies","query","body"]:
+                        section = o
+                    else:
+                        value = o 
+
+
             if self._validate(args,"log_id"):
                 log = self.logs.Get(args.log_id)
                 orig, err = self.replay.Request(log,None)
@@ -485,7 +496,7 @@ class Controller(object):
                 self._result(args.log_id,"PERM",{"Base Line":""},orig,False,None)
                 self.replay.Repeat(
                     args.log_id,log,"PERM",
-                    self.logs.Permutations(False if args.ALL else args.log_id,opts),None,None,
+                    self.logs.Permutations(False if args.ALL else args.log_id,section,value),None,None,
                     [Html.Compare,orig], self._result, self.display.Error
                 )
                 self.display.BR()

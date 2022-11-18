@@ -19,6 +19,7 @@ class Options(object):
         self.Set("oauth_keyfile","/path/to/your/private.pem")
         self.Set("oauth_kid","kid-from-your-oauth2-server")
         self.Set("highlight",["qwerty","ytrewq"])
+        self.Set("nasty","AAA<\"})]'..%2f%250a\nAAA")
         self.load()
     
     def load(self):

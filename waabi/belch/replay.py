@@ -150,6 +150,11 @@ class Replay(object):
                         v["query"] = Html.QueryToStr(o["query"])
                     if parameter == "body":
                         v["body"] = x.request.content
+                    if parameter.find("headers") == 0 or parameter.find("cookies") == 0:
+                        value = value.replace("\n","%0a")
+                        if parameter == "headers.Host":
+                            value = "AAAAAAA"
+                        
 
                     pt = To.Array(parameter,".") 
                     for i in range(len(pt)): 
@@ -179,7 +184,7 @@ class Replay(object):
                         ct = o["headers"][k]
                 json = o["body"] if ct.find("json") > -1 else None
                 body = None if json != None else o["body"]
-
+            
             r = requests.request(
                 o["method"].lower(),
                 o["url"] + o["path"],

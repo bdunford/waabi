@@ -109,15 +109,7 @@ class Logs(object):
                     result[k] = [] if v == None else v
         return result
 
-    def Permutations(self,log_id,options):
-        section = None
-        value = "AAAAAAA"
-        for o in options:
-            if o:
-                if o in ["headers","cookies","query","body"]:
-                    section = o
-                else:
-                    value = o 
+    def Permutations(self,log_id,section,value):
         ret = []
         for key,parms in self.Parameters(log_id).items():
             if parms:
