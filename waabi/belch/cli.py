@@ -239,6 +239,17 @@ class Cli(Cmd):
 
         if not self.ctlr.traversal_cmd(args):
             self._invalid("traversal")
+ 
+    def do_discover(self,args):
+        """
+        Discover a series of requests against a list of directory common files/directories
+        Usage: discover [log number]
+        Examples: discover 123
+
+        """
+
+        if not self.ctlr.discover_cmd(args):
+            self._invalid("discover")
     
     def do_permutate(self,args):
         """

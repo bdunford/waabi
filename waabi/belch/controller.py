@@ -80,7 +80,6 @@ class Controller(object):
         skip = False
         if rslt_type == "PERM" and meta and meta["count"] == 0:
             skip = True
-
         if not skip:
             rslt_id = self.results.Add(log_id,rslt_type,pv,res,flag,meta)
             self.display.Result(self.results.Get(rslt_id))
@@ -466,6 +465,31 @@ class Controller(object):
 
     def traversal_cmd(self,raw):
         return self._fuzz("TRVS","traversal",raw)
+
+    def discover_cmd(self,raw):
+        encpth = self.options.Get("encode_path")
+        try:
+            args = Args(raw,[("log_id",int)],1)                
+            if self._validate(args,"log_id"):
+                self.options.Set("encode_path",False)
+                log = self.logs.Get(args.log_id)
+                tpl = "/".join(log.path.split("/")[:-1]) + "/{0}"
+                self.display.ResultHeader()
+                self.replay.Repeat(
+                    args.log_id,log,"DISC","path",
+                    list(filter(lambda f: (len(f) > 0 and f[0] != "#"),WordList.Get("discover"))),
+                    [tpl],
+                    [lambda res: (False if res.status_code == 404 else True,None)],
+                    self._result,
+                    self.display.Error
+                )
+                self.display.BR()
+                self.options.Set("encode_path",encpth)
+                return True
+        except: 
+            self.options.Set("encode_path",encpth)
+            self._error()
+        return False
 
     def permutate_cmd(self,raw):
         try:
