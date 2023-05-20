@@ -1,26 +1,12 @@
-#README
 readme.html
 readme.txt
 README
 readme
 README.md
 readme.md
-
-#Licenses
-
-#Common files
+LICENSE
 robots.txt
 sitemap.xml
-index.php
-index.html
-index.htm
-index.jsp
-index.asp
-index.aspx
-index.js
-default.asp
-default.aspx
-default.php
 .well-known
 .htaccess
 .htpasswd
@@ -35,18 +21,11 @@ error.php
 error.aspx
 error.jsp
 nginx.conf
-LICENSE
 CHANGES
-
-#OS files
 .DS_Store
 Desktop.ini
-
-#Docker
 Dockerfile
 docker-compose.yaml
-
-#Certificates
 id_rsa
 id_rsa.key
 id_rsa.priv
@@ -55,8 +34,6 @@ private
 private.key
 certificate.pem
 certificate.cer
-
-#PackageManagers
 Gemfile
 Gemfile.lock
 requirements.txt
@@ -67,16 +44,21 @@ composer.json
 .composer
 packages.config
 composer.lock
-
-
-#SourceControll & Build & Deploy
+requirements.txt
+requirements.version
+go.mod
+go.sum
 GitVersion.xml
 .gitignore
 .gitignore.swp
 .git_release
 .gitattributes
 .gitconfig
+.git/config
+.git/HEAD
+.git/index
 .git
+sonar-project.properties
 Makefile
 config.yaml
 azure-pipelines.yml
@@ -84,15 +66,12 @@ azure-pipelines.yml
 .github/workflow/ci.yml
 .github
 Jenkinsfile
-
-#Popular Frameworks
+webpack.config.js
 graphql
 api/graphql
 v1/api/graphql
 wp-content
 wordpress
-
-#CommonDirectories
 login
 admin
 administrator
@@ -123,6 +102,5 @@ templates
 cms
 error
 www
-
-#backup files
-
+v1
+~
